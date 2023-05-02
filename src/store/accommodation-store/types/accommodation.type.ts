@@ -1,15 +1,17 @@
 export type Accommodation = {
-    id: string
-    name: string
-    street: string
-    streetNumber: string
-    city: string
-    zipcode: string
-    country: string
-    wifi: boolean
-    kitchen: boolean
-    airConditioner: boolean
-    freeParking: boolean
-    minGuests: number
-    maxGuests: number
+    Id: string
+    Name: string
+    Street: string
+    StreetNumber: string
+    City: string
+    Zipcode: string
+    Country: string
+    Wifi: boolean
+    Kitchen: boolean
+    AirConditioner: boolean
+    FreeParking: boolean
+    MinGuests: number
+    MaxGuests: number
+    PictureUrls: string[]
+    OwnerId: string
 }
