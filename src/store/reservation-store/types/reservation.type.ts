@@ -1,9 +1,9 @@
 export type Reservation = {
     Id?: string
-    AccommodationId: string
-    BuyerId: string
-    StartDate: Date
-    EndDate: Date
-    Guests: number
-    Status?: number
+    accommodationId: string
+    buyerId: string
+    startDate: Date
+    endDate: Date
+    guests: number
+    status?: number
 }

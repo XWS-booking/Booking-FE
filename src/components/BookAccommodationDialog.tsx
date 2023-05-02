@@ -69,10 +69,17 @@ export const BookAccommodationDialog = ({ isOpen, onClose, accommodation } : Pro
     setIsDateValid(false)
   }
 
+  const isAccommodationAvailable = useApplicationStore(state => state.isAccommodationAvailable)
+  const isAvailableRes = useApplicationStore(state => state.isAvailableRes)
+  const checkAvailability= async () => {
+    await isAccommodationAvailable(accommodation.Id, startDate, endDate)
+    handleNext()
+  }
+
   const BookAccommodation = useApplicationStore(state => state.bookAccommodation)
   const toast = useToast()
   const book = async () => {
-    await BookAccommodation({AccommodationId: accommodation.Id, StartDate: startDate, EndDate: endDate, Guests: guests, BuyerId: "6451456800523bd6eb9a9ee6"})
+    await BookAccommodation({accommodationId: accommodation.Id, startDate: startDate, endDate: endDate, guests: guests, buyerId: "6451456800523bd6eb9a9ee6"})
     toast({
         title: "Request sent",
         description: "Reservation request has been sent!",
@@ -81,6 +88,10 @@ export const BookAccommodationDialog = ({ isOpen, onClose, accommodation } : Pro
         isClosable: true,
         position: "top-right"
     });
+    closeModal()
+  }
+
+  const closeModal = () => {
     setActiveStep(0)
     setIsDateValid(false);
     setIsGuestsValid(false);
@@ -108,7 +119,7 @@ export const BookAccommodationDialog = ({ isOpen, onClose, accommodation } : Pro
             </Flex>
         </ModalBody>
         <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleNext} isDisabled={!isDateValid}>
+            <Button colorScheme="blue" mr={3} onClick={checkAvailability} isDisabled={!isDateValid}>
               Next
             </Button>
         </ModalFooter>
@@ -119,28 +130,43 @@ export const BookAccommodationDialog = ({ isOpen, onClose, accommodation } : Pro
   function renderGuestsForm() {
     return (
         <>
-        <ModalBody>
-            <Flex flexDirection='row'>
-                <FormControl>
-                    <FormLabel mb='0'>Guests</FormLabel>
-                    <Input type='number' min='1' width='150px' onChange={handleGuestsChange}></Input>
-                </FormControl>
-            </Flex>
-        </ModalBody>
-        <ModalFooter>
-            <Button colorScheme="gray" mr={3} onClick={cleanDates}>
-              Previous
-            </Button>
-            <Button colorScheme="blue" mr={3} onClick={book} isDisabled={!isGuestsValid}>
-              Book
-            </Button>
-        </ModalFooter>
+        { isAvailableRes == true &&
+            <><ModalBody>
+            
+                <Flex flexDirection='row'>
+                    <FormControl>
+                        <FormLabel mb='0'>Guests</FormLabel>
+                        <Input type='number' min='1' width='150px' onChange={handleGuestsChange}></Input>
+                    </FormControl>
+                </Flex>
+            </ModalBody>
+            <ModalFooter>
+                <Button colorScheme="gray" mr={3} onClick={cleanDates}>
+                Previous
+                </Button>
+                <Button colorScheme="blue" mr={3} onClick={book} isDisabled={!isGuestsValid}>
+                Book
+                </Button>
+            </ModalFooter>
+            </>
+        }
+         { isAvailableRes == false &&
+            <><ModalBody>
+              Sorry, the accommodation is not available in the selected time range.
+            </ModalBody>
+            <ModalFooter>
+                <Button colorScheme="gray" mr={3} onClick={cleanDates}>
+                Previous
+                </Button>
+            </ModalFooter>
+            </>
+        }
         </>
     );
   }
   
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg">
+    <Modal isOpen={isOpen} onClose={closeModal} size="lg">
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Book accommodation '{accommodation.Name}'</ModalHeader>
