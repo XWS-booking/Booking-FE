@@ -1,14 +1,19 @@
-import { useEffect } from "react"
-import { Box, Image, Badge, Text, Flex, Card } from "@chakra-ui/react";
+import { useEffect, useState } from "react"
+import { Box, Image, Badge, Text, Flex, Card, Button } from "@chakra-ui/react";
 import { Accommodation } from "../store/accommodation-store/types/accommodation.type";
 import Slider from 'react-slick';
 import { title } from "process";
+import { BookAccommodationDialog } from "./BookAccommodationDialog";
 
 interface Props {
     accommodation: Accommodation
  }
 
 export const AccommodationCard = ({accommodation} : Props) => {
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const handleOpenModal = () => setIsModalOpen(true);
+    const handleCloseModal = () => setIsModalOpen(false);
 
     const settings = {
         dots: true,
@@ -64,12 +69,11 @@ export const AccommodationCard = ({accommodation} : Props) => {
           </Box>
 
           <Box mt="2">
-            <Text fontSize="xl" fontWeight="semibold">
-              $200 <Text as="span" color="gray.600" fontSize="md">/ night</Text>
-            </Text>
+            <Button onClick={handleOpenModal}>Book</Button>
           </Box>
         </Box>
     </Card>
+    <BookAccommodationDialog isOpen={isModalOpen} onClose={handleCloseModal} accommodation={accommodation}/>
         </>
     )
 }

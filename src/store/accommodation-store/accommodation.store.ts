@@ -36,6 +36,7 @@ export const accommodationStoreSlice: StateCreator<AppStore, [], [], Accommodati
           
             set(
                 produce((state: AccommodationStore) => {
+                    console.log(res.data)
                     state.spinner = false
                     state.accommodationPage = res.data
                     return state
