@@ -13,9 +13,10 @@ function App() {
       direction='column'
     >
       <Header></Header>
-      <Outlet />
+      <Box>
+        <Outlet/>
+      </Box>
       <Footer></Footer>
-
     </Flex>
   );
 }
