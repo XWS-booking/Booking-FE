@@ -57,7 +57,12 @@ export const accommodationStoreSlice: StateCreator<
       const res = await axios.get(
         `${
           process.env.REACT_APP_BASE_URL
-        }/api/searchAccommodation/${city}/${guests}/${startDate.toISOString()}/${endDate.toISOString()}/${pageSize}/${pageNumber}`
+        }/api/searchAccommodation/${city}/${guests}/${startDate.toISOString()}/${endDate.toISOString()}/${pageSize}/${pageNumber}`,
+        {
+          headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + get().token
+        }}
       );
 
       set(

@@ -1,7 +1,7 @@
 export type Reservation = {
     Id?: string
     accommodationId: string
-    buyerId: string
+    buyerId?: string
     startDate: Date
     endDate: Date
     guests: number

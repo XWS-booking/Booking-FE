@@ -17,6 +17,7 @@ import {
 import { Accommodation } from "../../store/accommodation-store/types/accommodation.type";
 import { useApplicationStore } from "../../store/application.store";
 import { useToast } from "@chakra-ui/react";
+import { displayToast } from "../../utils/toast.caller";
 
 interface Props {
     isOpen : boolean
@@ -78,17 +79,11 @@ export const BookAccommodationDialog = ({ isOpen, onClose, accommodation } : Pro
   }
 
   const BookAccommodation = useApplicationStore(state => state.bookAccommodation)
+  const user = useApplicationStore(state => state.user)
   const toast = useToast()
   const book = async () => {
-    await BookAccommodation({accommodationId: accommodation.Id, startDate: startDate, endDate: endDate, guests: guests, buyerId: "6451456800523bd6eb9a9ee6"})
-    toast({
-        title: "Request sent",
-        description: "Reservation request has been sent!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "top-right"
-    });
+    await BookAccommodation({accommodationId: accommodation.Id, startDate: startDate, endDate: endDate, guests: guests, buyerId: user?.id})
+    displayToast(toast, "Reservation request has been sent!", "success");
     closeModal()
   }
 

@@ -1,28 +1,33 @@
 import { produce } from 'immer';
+import axios from 'axios';
+import { AppStore } from "../application.store";
 import { StateCreator } from "zustand"
 import { User } from "./model/user.model"
 import { Login } from "./types/login.type"
-import { Registration } from "./types/registration.type"
 import { DEFAULT_HEADERS } from "../../utils/auth.constants"
+
 
 export type AuthStoreState = {
     token: string | null,
-    user: User | null
+    user: User | null,
+    deleteProfileRes: any
 }
 export type AuthActions = {
     login: (data: Login) => Promise<boolean>,
     logout: () => void,
+    deleteProfile: () => Promise<void>
 }
 
 export const state: AuthStoreState = {
     token: null,
     user: null,
+    deleteProfileRes: null
 }
 
 
 export type AuthStore = AuthStoreState & AuthActions
 
-export const authStoreSlice: StateCreator<AuthStore> = (set) => ({
+export const authStoreSlice:  StateCreator<AppStore, [], [], AuthStore> = (set, get) => ({
     ...state,
     login: async ({ email, password }: Login) => {
         const rawResponse = await fetch(`${process.env.REACT_APP_BASE_URL}/api/auth/signin`, {
@@ -63,6 +68,26 @@ export const authStoreSlice: StateCreator<AuthStore> = (set) => ({
                 return state
             })
         )
+    },
+    deleteProfile: async () => {
+        try {
+            const res = await axios.delete(`${process.env.REACT_APP_BASE_URL}/api/deleteProfile`, 
+            {
+                headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + get().token
+                }}
+            )
+            set(
+                produce((state: AuthStore) => {
+                    console.log(res.data)
+                    state.deleteProfileRes = res.data
+                    return state
+                })
+            )
+        } catch (e) {
+            console.log(e)
+        }
     },
 })
 

@@ -24,7 +24,13 @@ export const reservationStoreSlice: StateCreator<AppStore, [], [], ReservationSt
     ...state,
     bookAccommodation: async (reservation: Reservation) => {
         try {
-            const res = await axios.post(`${process.env.REACT_APP_BASE_URL}/api/reservation`, reservation)
+            const res = await axios.post(`${process.env.REACT_APP_BASE_URL}/api/reservation`, reservation, 
+            {
+                headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + get().token
+            }}
+            )
             set(
                 produce((state: ReservationStore) => {
                     state.bookAccommodationRes = res.data
@@ -37,7 +43,13 @@ export const reservationStoreSlice: StateCreator<AppStore, [], [], ReservationSt
     },
     isAccommodationAvailable: async (id: string, startDate: Date, endDate: Date) => {
         try {
-            const res = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/reservation/isAccommodationAvailable/${id}/${startDate.toISOString()}/${endDate.toISOString()}`)
+            const res = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/reservation/isAccommodationAvailable/${id}/${startDate.toISOString()}/${endDate.toISOString()}`, 
+            {
+                headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + get().token
+                }}
+            )
             set(
                 produce((state: ReservationStore) => {
                     state.isAvailableRes = res.data.available
