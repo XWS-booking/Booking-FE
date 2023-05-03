@@ -110,6 +110,7 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (set, g
             set(
                 produce((state: AuthStoreState) => {
                     state.deleteProfileRes.status = "ERROR"
+                    state.deleteProfileRes.error = e.response.data
                     return state
                 })
             )

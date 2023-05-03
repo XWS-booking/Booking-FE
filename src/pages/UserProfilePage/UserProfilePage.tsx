@@ -11,7 +11,6 @@ export const UserProfilePage = () => {
     const logout = useApplicationStore(state => state.logout)
     const toast = useToast()
     const navigate = useNavigate();
-    const [startedDeletion, setStartedDeletion] = useState<boolean>(false)
 
     const handleDeleteProfile = async () => {
         await deleteProfile()
@@ -20,6 +19,8 @@ export const UserProfilePage = () => {
     useEffect(() => {
         if(deleteProfileRes.status === "SUCCESS") {
             displayToast(toast, "Successfully deleted profile!", "success")
+            logout()
+            navigate("/")
             return
         }
         if(deleteProfileRes.status === "ERROR") {
@@ -31,8 +32,8 @@ export const UserProfilePage = () => {
     return (
         <>
         <Button colorScheme="red" onClick={handleDeleteProfile}>
-            {!startedDeletion && <p>Delete profile</p>}
-            {startedDeletion &&
+            {deleteProfileRes.status != "LOADING" && <p>Delete profile</p>}
+            {deleteProfileRes.status === "LOADING" &&
                 <Flex justifyContent='center'>
                     <Spinner size='lg' />
                 </Flex>}
