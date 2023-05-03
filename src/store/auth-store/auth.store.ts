@@ -36,11 +36,20 @@ export const authStoreSlice: StateCreator<AuthStore> = (set) => ({
             return res.json();
         });
         const token = await rawResponse;
-        if(token == null) return false
+        console.log(JSON.stringify({token: token['accessToken']}))
+        const resp = await fetch(`${process.env.REACT_APP_BASE_URL}/api/auth/user`, {
+            method: 'POST',
+            body: JSON.stringify({token: "Bearer " + token['accessToken']}),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token['accessToken']
+            }
+        });
+        const user = await resp.json();
         set(
             produce((state: AuthStore) => {
                 state.token = token['accessToken']
-                state.user = null
+                state.user = user
                 return state
             })
         )
