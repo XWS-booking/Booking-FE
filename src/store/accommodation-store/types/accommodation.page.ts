@@ -1,6 +1,6 @@
 import { Accommodation } from "./accommodation.type"
 
 export type AccommodationPage = {
-    Data: Accommodation[]
-    TotalCount: number
+    data: Accommodation[]
+    totalCount: number
 }

@@ -4,6 +4,7 @@ import { Accommodation } from "../../store/accommodation-store/types/accommodati
 import Slider from 'react-slick';
 import { title } from "process";
 import { BookAccommodationDialog } from "./BookAccommodationDialog";
+import { useApplicationStore } from "../../store/application.store";
 
 interface Props {
     accommodation: Accommodation
@@ -14,6 +15,7 @@ export const AccommodationCard = ({accommodation} : Props) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const handleOpenModal = () => setIsModalOpen(true);
     const handleCloseModal = () => setIsModalOpen(false);
+    const user = useApplicationStore(state => state.user)
 
     const settings = {
         dots: true,
@@ -27,17 +29,17 @@ export const AccommodationCard = ({accommodation} : Props) => {
 
     return (
         <>
-    <Card maxWidth="50%" display="flex" flexDirection='row' mb='8'>
-      <Box width="50%" paddingRight="2">
+    <Card maxWidth="45vw" display="flex" flexDirection='row' mb='3'>
+      <Box padding='20px' width="40%">
         <Slider {...settings}>
-          {accommodation.PictureUrls.map((image) => (
-            <Box key={image} height="300px">
-              <img src={image} alt="" style={{ objectFit: "cover", height: "100%", width: "100%" }} />
+          {accommodation.pictureUrls.map((image) => (
+            <Box key={image}>
+              <img src={image} alt="" style={{ objectFit: "cover", height: "250px", width :"250px"}} />
             </Box>
           ))}
         </Slider>
       </Box>
-      <Box p="6" w="50%">
+      <Box p="6" w="60%">
           <Box display="flex" alignItems="baseline">
             <Box
               color="gray.500"
@@ -47,30 +49,31 @@ export const AccommodationCard = ({accommodation} : Props) => {
               textTransform="uppercase"
               ml="2"
             >
-              {accommodation.Wifi === true && <Badge borderRadius="full" px="2" colorScheme="teal">Wifi</Badge>}
-              {accommodation.Kitchen === true && <Badge borderRadius="full" px="2" colorScheme="teal">Kitchen</Badge>}
-              {accommodation.AirConditioner === true && <Badge borderRadius="full" px="2" colorScheme="teal">Air conditioner</Badge>}
-              {accommodation.FreeParking === true && <Badge borderRadius="full" px="2" colorScheme="teal">Free parking</Badge>}
+              {accommodation.wifi === true && <Badge borderRadius="full" px="2" colorScheme="teal">Wifi</Badge>}
+              {accommodation.kitchen === true && <Badge borderRadius="full" px="2" colorScheme="teal">Kitchen</Badge>}
+              {accommodation.airConditioner === true && <Badge borderRadius="full" px="2" colorScheme="teal">Air conditioner</Badge>}
+              {accommodation.freeParking === true && <Badge borderRadius="full" px="2" colorScheme="teal">Free parking</Badge>}
             </Box>
           </Box>
 
-          <Box mt="1" fontWeight="semibold" as="h4" lineHeight="tight">
-            {accommodation.Name}
+          <Box mt="1" fontWeight="semibold" lineHeight="tight">
+            {accommodation.name}
           </Box>
 
           <Box>
             <Text mt="1" color="gray.500">
-              {accommodation.Street} {accommodation.StreetNumber}, {accommodation.Zipcode} {accommodation.City}, {accommodation.Country}
+              {accommodation.street} {accommodation.streetNumber}, {accommodation.zipcode} {accommodation.city}, {accommodation.country}
             </Text>
             <Text mt="2">
-              Min guests: {accommodation.MinGuests} <br/>
-              Max guests: {accommodation.MaxGuests}
+              Min guests: {accommodation.minGuests} <br/>
+              Max guests: {accommodation.maxGuests}
             </Text>
           </Box>
-
+          { user?.role == 0 &&
           <Box mt="2">
-            <Button onClick={handleOpenModal}>Book</Button>
+            <Button colorScheme="blue" onClick={handleOpenModal}>Book</Button>
           </Box>
+          }
         </Box>
     </Card>
     <BookAccommodationDialog isOpen={isModalOpen} onClose={handleCloseModal} accommodation={accommodation}/>

@@ -23,7 +23,7 @@ export type AccommodationActions = {
 };
 
 export const state: AccommodationStoreState = {
-  accommodationPage: { Data: [], TotalCount: 0 },
+  accommodationPage: { data: [], totalCount: 0 },
   spinner: false,
   createAccommodationRes: null,
 };
@@ -49,7 +49,7 @@ export const accommodationStoreSlice: StateCreator<
       set(
         produce((state: AccommodationStore) => {
           state.spinner = true;
-          state.accommodationPage = { TotalCount: 0, Data: [] };
+          state.accommodationPage = { totalCount: 0, data: [] };
           return state;
         })
       );
@@ -57,7 +57,12 @@ export const accommodationStoreSlice: StateCreator<
       const res = await axios.get(
         `${
           process.env.REACT_APP_BASE_URL
-        }/api/searchAccommodation/${city}/${guests}/${startDate.toISOString()}/${endDate.toISOString()}/${pageSize}/${pageNumber}`
+        }/api/searchAccommodation/${city}/${guests}/${startDate.toISOString()}/${endDate.toISOString()}/${pageSize}/${pageNumber}`,
+        {
+          headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + get().token
+        }}
       );
 
       set(

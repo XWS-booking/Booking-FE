@@ -40,9 +40,9 @@ export const AccommodationPage = () => {
         <>
             <SearchAccommodation sendData={sendData}></SearchAccommodation>
             <Flex flexDirection='column' justifyContent='center' alignItems='center'>
-            {accommodationPage.Data &&
-                accommodationPage.Data.map((item: Accommodation) => (
-                    <AccommodationCard key={item.Id} accommodation={item}></AccommodationCard>
+            {accommodationPage.data &&
+                accommodationPage.data.map((item: Accommodation) => (
+                    <AccommodationCard key={item.id} accommodation={item}></AccommodationCard>
                 ))
             
             }
@@ -65,7 +65,7 @@ export const AccommodationPage = () => {
                     nextClassName={"item next "}
                     nextLabel=">"
                     onPageChange={handlePageClick}
-                    pageCount={Math.ceil(accommodationPage.TotalCount/4)}
+                    pageCount={Math.ceil(accommodationPage.totalCount/4)}
                     pageClassName={'item pagination-page '}
                     pageRangeDisplayed={2}
                     previousClassName={"item previous"}
