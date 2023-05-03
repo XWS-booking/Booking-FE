@@ -57,7 +57,7 @@ export const BookAccommodationDialog = ({ isOpen, onClose, accommodation } : Pro
 
   const handleGuestsChange = (event: any) => {
     const newGuests = event.target.value
-    if (newGuests > 0) {
+    if (newGuests >= accommodation.MinGuests && newGuests <=accommodation.MaxGuests) {
         setGuests(newGuests)
         setIsGuestsValid(true)
     } else{
@@ -136,8 +136,8 @@ export const BookAccommodationDialog = ({ isOpen, onClose, accommodation } : Pro
             
                 <Flex flexDirection='row'>
                     <FormControl>
-                        <FormLabel mb='0'>Guests</FormLabel>
-                        <Input type='number' min='1' width='150px' onChange={handleGuestsChange}></Input>
+                        <FormLabel mb='0'>Number of guests (min: {accommodation.MinGuests}, max: {accommodation.MaxGuests})</FormLabel>
+                        <Input type='number' width="150px" min={accommodation.MinGuests} max={accommodation.MaxGuests} onChange={handleGuestsChange}></Input>
                     </FormControl>
                 </Flex>
             </ModalBody>
