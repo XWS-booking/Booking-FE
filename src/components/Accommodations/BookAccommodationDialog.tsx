@@ -30,15 +30,16 @@ export const BookAccommodationDialog = ({isOpen, onClose, accommodation}: Props)
     const [activeStep, setActiveStep] = useState(0);
     const handleNext = () => setActiveStep(prevStep => prevStep + 1);
     const handlePrev = () => setActiveStep(prevStep => prevStep - 1);
-    const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(new Date());
+    const [startDate, setStartDate] = useState(new Date("0001-01-01T00:00:00Z"));
+    const [endDate, setEndDate] = useState(new Date("0001-01-01T00:00:00Z"));
     const [guests, setGuests] = useState(0);
     const [isDateValid, setIsDateValid] = useState(false);
     const [isGuestsValid, setIsGuestsValid] = useState(false);
 
     const handleStartDateChange = (event: any) => {
         const newStartDate = new Date(event.target.value);
-        if (newStartDate > endDate || newStartDate < new Date()) {
+        const today = new Date(); 
+        if (newStartDate.getDate() > endDate.getDate() || newStartDate.getDate() <  today.getDate()) {
             setIsDateValid(false);
         } else {
             setIsDateValid(true);
@@ -48,7 +49,7 @@ export const BookAccommodationDialog = ({isOpen, onClose, accommodation}: Props)
 
     const handleEndDateChange = (event: any) => {
         const newEndDate = new Date(event.target.value);
-        if (startDate > newEndDate || startDate < new Date()) {
+        if (startDate.getDate() > newEndDate.getDate()) {
             setIsDateValid(false);
         } else {
             setIsDateValid(true);
@@ -99,6 +100,8 @@ export const BookAccommodationDialog = ({isOpen, onClose, accommodation}: Props)
 
     const closeModal = () => {
         setActiveStep(0)
+        setStartDate(new Date("0001-01-01T00:00:00Z"))
+        setEndDate(new Date("0001-01-01T00:00:00Z"))
         setIsDateValid(false);
         setIsGuestsValid(false);
         onClose()
