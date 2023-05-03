@@ -57,7 +57,9 @@ export const Header = () => {
                         }
                     </Flex>
                 </Flex>
-                <Button onClick={onOpen}>Create accommodation</Button>
+                <Button onClick={() => navigate('/accommodations')} mr='5px'>Accommodations</Button>
+                {user?.role == 1 && <Button onClick={onOpen} mr='5px'>Create accommodation</Button>}
+                {user?.role == 0 && <Button onClick={() => navigate('/reservations')} mr='5px'>Reservations</Button> }
             </Box>
             <CreateAccomodationForm
                 isOpen={isOpen}

@@ -29,7 +29,7 @@ export const AccommodationCard = ({accommodation} : Props) => {
 
     return (
         <>
-    <Card maxWidth="45vw" display="flex" flexDirection='row' mb='3'>
+    <Card width="45vw" display="flex" flexDirection='row' mb='3'>
       <Box padding='20px' width="40%">
         <Slider {...settings}>
           {accommodation.pictureUrls.map((image) => (
