@@ -10,6 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { CreateAccomodationForm } from "../CreateAccomodationForm/CreateAccomodationForm";
 import { LoginForm } from "../Auth/LoginForm";
+import { useApplicationStore } from "../../store/application.store";
 
 export const Header = () => {
   const {
@@ -19,6 +20,13 @@ export const Header = () => {
   } = useDisclosure();
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const token = useApplicationStore((state) => state.token);
+  const logout = useApplicationStore((state) => state.logout);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <>
@@ -35,9 +43,17 @@ export const Header = () => {
             </Text>
           </Link>
           <Flex gap="15px">
-            <Link onClick={onOpenLogin} color={"white"}>
-              Login
-            </Link>
+            {token == null && (
+              <Link onClick={onOpenLogin} color={"white"}>
+                Login
+              </Link>
+            )}
+
+            {token != null && (
+              <Link color={"white"} onClick={handleLogout}>
+                Logout
+              </Link>
+            )}
           </Flex>
         </Flex>
         <Button onClick={onOpen}>Create accommodation</Button>

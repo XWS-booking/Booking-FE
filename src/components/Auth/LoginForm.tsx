@@ -20,6 +20,7 @@ import {
   LOGIN_VALIDATION_SCHEMA,
 } from "../../utils/auth.constants";
 import { displayToast } from "../../utils/toast.caller";
+import { useApplicationStore } from "../../store/application.store";
 
 export type FormValues = {
   email: string;
@@ -32,6 +33,7 @@ interface Props {
 }
 
 export const LoginForm = ({ isOpen, onOpen, onClose }: Props) => {
+  let login = useApplicationStore((state) => state.login);
   const {
     register,
     handleSubmit,
@@ -50,9 +52,8 @@ export const LoginForm = ({ isOpen, onOpen, onClose }: Props) => {
     onClose();
   };
   const handleOnSubmit = async (values: FormValues) => {
-    //const isLoginValid = await login(values);
-    //validateLogin(isLoginValid);
-    console.log(values);
+    const isLoginValid = await login(values);
+    validateLogin(isLoginValid);
   };
 
   return (

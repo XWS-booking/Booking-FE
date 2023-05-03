@@ -16,3 +16,6 @@ export const REGISTER_DEFAULT_VALUES = {
     name: "",
     surname: ""
 }
+export const DEFAULT_HEADERS = {
+    'Content-Type': 'application/json'
+}
