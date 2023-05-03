@@ -1,15 +1,12 @@
 import {Box, Button, Flex, FormControl, FormLabel, Input} from '@chakra-ui/react'
 import { useEffect, useState } from 'react';
 import { Form } from 'react-router-dom';
-import { useApplicationStore } from '../../store/application.store';
 
 interface Props {
-    sendData: (city: string, guests: number, startDate: Date, endDate: Date) => void
+    filterByParams: (city: string, guests: number, startDate: Date, endDate: Date) => void
  }
 
-export const SearchAccommodation = ({sendData}: Props) => {
-
-    const getAccommodations = useApplicationStore(state => state.getAccommodations)
+export const SearchAccommodation = ({filterByParams}: Props) => {
     const [city, setCity] = useState<string>("")
     const [guests, setGuests] = useState<number>(-1)
     const [startDate, setStartDate] = useState<Date>(new Date("0001-01-01T00:00:00Z"))
@@ -23,27 +20,26 @@ export const SearchAccommodation = ({sendData}: Props) => {
     const handleGuestsInputChange = (event: any) => {
         if (event.target.value == "")
             setGuests(-1)
-        else 
+        else
             setGuests(event.target.value);
     };
-      
+
     const handleStartDateInputChange = (event: any) => {
         if (event.target.value == "")
             setStartDate(new Date("0001-01-01T00:00:00Z"))
-        else 
+        else
             setStartDate(new Date(event.target.value));
     };
 
     const handleEndDateInputChange = (event: any) => {
         if (event.target.value == "")
             setEndDate(new Date("0001-01-01T00:00:00Z"))
-        else 
+        else
             setEndDate(new Date(event.target.value));
       };
-    
+
     const onSubmit = async () => {
-        await getAccommodations(city, guests, startDate, endDate, 4, 1)
-        sendData(city, guests, startDate, endDate)
+        filterByParams(city, guests, startDate, endDate)
     }
 
     return (

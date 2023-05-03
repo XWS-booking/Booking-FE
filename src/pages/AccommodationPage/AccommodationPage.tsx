@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react"
 import { useApplicationStore } from "../../store/application.store"
-import { Box, Image, Badge, Text, Flex, Spinner } from "@chakra-ui/react";
+import { Flex, Spinner } from "@chakra-ui/react";
 import { Accommodation } from "../../store/accommodation-store/types/accommodation.type";
 import { AccommodationCard } from "../../components/Accommodations/AccommodationCard";
 import "../../styles/pagination.css"
 import ReactPaginate from 'react-paginate';
 import { SearchAccommodation } from "../../components/Accommodations/SearchAccommodation";
-import { start } from "repl";
+import {AccomodationsFilter} from "../../store/accommodation-store/types/accomodations-filter.type";
 
 export const AccommodationPage = () => {
 
     const getAccommodations = useApplicationStore(state => state.getAccommodations)
-    const accommodationPage = useApplicationStore(state => state.accommodationPage)
-    const spinner = useApplicationStore(state => state.spinner)
+    const accommodationPageRes = useApplicationStore(state => state.accommodationPageRes)
     const [currentPage, setCurrentPage] = useState<number>(1)
     const [city, setCity] = useState<string>("")
     const [guests, setGuests] = useState<number>(-1)
@@ -20,34 +19,62 @@ export const AccommodationPage = () => {
     const [endDate, setEndDate] = useState<Date>(new Date("0001-01-01T00:00:00Z"))
 
     useEffect(() => {
-        getAccommodations(city, guests, startDate, endDate, 4, currentPage)
+        const filters: AccomodationsFilter = {
+            city,
+            guests,
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+            pageSize: 4,
+            pageNumber: currentPage
+        }
+        fetchAccommodations(filters)
     }, [])
 
-    const sendData = (city: string, guests: number, startDate: Date, endDate: Date) => {
+    const filterByParams = async (city: string, guests: number, startDate: Date, endDate: Date) => {
         setCity(city)
         setGuests(guests)
         setStartDate(startDate)
         setEndDate(endDate)
         setCurrentPage(1)
+        await fetchAccommodations({
+            city,
+            guests,
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+            pageSize: 4,
+            pageNumber: 1
+        })
     };
-    
+
     const handlePageClick = async (event: any) => {
-        await getAccommodations(city, guests, startDate, endDate, 4, event.selected + 1)
+        const filters: AccomodationsFilter = {
+            city,
+            guests,
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+            pageSize: 4,
+            pageNumber: event.selected + 1
+        }
+        await fetchAccommodations(filters)
         setCurrentPage(event.selected + 1)
     };
 
+    const fetchAccommodations = async (filters: AccomodationsFilter) =>{
+        await getAccommodations(filters)
+    }
+
     return (
         <>
-            <SearchAccommodation sendData={sendData}></SearchAccommodation>
+            <SearchAccommodation filterByParams={filterByParams}></SearchAccommodation>
             <Flex flexDirection='column' justifyContent='center' alignItems='center'>
-            {accommodationPage.data &&
-                accommodationPage.data.map((item: Accommodation) => (
+            {accommodationPageRes.data.data &&
+                accommodationPageRes.data.data.map((item: Accommodation) => (
                     <AccommodationCard key={item.id} accommodation={item}></AccommodationCard>
                 ))
-            
+
             }
-            
-            {spinner == true &&
+
+            {accommodationPageRes.status === "LOADING" &&
                 <Flex justifyContent='center'>
                     <Spinner size='xl' />
                 </Flex>
@@ -65,7 +92,7 @@ export const AccommodationPage = () => {
                     nextClassName={"item next "}
                     nextLabel=">"
                     onPageChange={handlePageClick}
-                    pageCount={Math.ceil(accommodationPage.totalCount/4)}
+                    pageCount={Math.ceil(accommodationPageRes.data.totalCount/4)}
                     pageClassName={'item pagination-page '}
                     pageRangeDisplayed={2}
                     previousClassName={"item previous"}

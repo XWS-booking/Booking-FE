@@ -1,5 +1,4 @@
 export type CreateAccommodation = {
-  id: string;
   name: string;
   street: string;
   streetNumber: string;
@@ -13,5 +12,4 @@ export type CreateAccommodation = {
   minGuests: number;
   maxGuests: number;
   pictures: FileList;
-  ownerId: string;
 };

@@ -1,93 +1,141 @@
-import { produce } from 'immer';
+import {produce} from 'immer';
 import axios from 'axios';
-import { AppStore } from "../application.store";
-import { StateCreator } from "zustand"
-import { User } from "./model/user.model"
-import { Login } from "./types/login.type"
-import { DEFAULT_HEADERS } from "../../utils/auth.constants"
+import {AppStore} from "../application.store";
+import {StateCreator} from "zustand"
+import {User} from "./model/user.model"
+import {Login} from "./types/login.type"
+import {ResponseState} from "../response-state.type";
 
+
+const BASE_URL = process.env.REACT_APP_BASE_URL
 
 export type AuthStoreState = {
-    token: string | null,
     user: User | null,
-    deleteProfileRes: any
+    deleteProfileRes: ResponseState<void[]>,
+    loginStateRes: ResponseState<string | null>,
 }
+
 export type AuthActions = {
-    login: (data: Login) => Promise<boolean>,
+    login: (data: Login) => Promise<void>,
     logout: () => void,
-    deleteProfile: () => Promise<any>
+    deleteProfile: () => Promise<void>
+    fetchLoggedUser: (token: string) => Promise<void>
+
 }
 
 export const state: AuthStoreState = {
-    token: null,
     user: null,
-    deleteProfileRes: null
+    deleteProfileRes: {
+        data: [],
+        status: "IDLE",
+        error: null
+    },
+    loginStateRes: {
+        data: null,
+        status: "IDLE",
+        error: null
+    }
 }
 
 
 export type AuthStore = AuthStoreState & AuthActions
 
-export const authStoreSlice:  StateCreator<AppStore, [], [], AuthStore> = (set, get) => ({
+export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (set, get) => ({
     ...state,
-    login: async ({ email, password }: Login) => {
-        const rawResponse = await fetch(`${process.env.REACT_APP_BASE_URL}/api/auth/signin`, {
-            method: 'POST',
-            body: JSON.stringify({ email, password }),
-            headers: DEFAULT_HEADERS
-        }).then(res => {
-            if(res.status >= 400) {
-                return null
-            }
-            return res.json();
-        });
-        const token = await rawResponse;
-        console.log(JSON.stringify({token: token['accessToken']}))
-        const resp = await fetch(`${process.env.REACT_APP_BASE_URL}/api/auth/user`, {
-            method: 'POST',
-            body: JSON.stringify({token: "Bearer " + token['accessToken']}),
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token['accessToken']
-            }
-        });
-        const user = await resp.json();
+    login: async (body: Login) => {
+        //Set status to loading
         set(
-            produce((state: AuthStore) => {
-                state.token = token['accessToken']
-                state.user = user
-                return state
+            produce((state: AuthStoreState) => {
+                state.loginStateRes.status = "LOADING"
+                return state;
             })
         )
-        return true;
+        // Call API
+        try {
+            const resp = await axios.post(`${BASE_URL}/api/auth/signin`, body)
+            //Set success state
+            set(
+                produce((state: AuthStoreState) => {
+                    state.loginStateRes.status = "SUCCESS"
+                    state.loginStateRes.data = resp.data.accessToken
+                    return state;
+                })
+            )
+            await get().fetchLoggedUser(resp.data.accessToken)
+        } catch (e: any) {
+            console.log(e)
+            //Set error state
+            set(
+                produce((state: AuthStoreState) => {
+                    state.loginStateRes.status = "ERROR"
+                    state.loginStateRes.data = null
+                    state.loginStateRes.error = e.response.data.message
+                    return state
+                })
+            )
+        }
     },
     logout: () => {
         set(
             produce((state: AuthStore) => {
-                state.token = null
+                state.loginStateRes.status = "IDLE"
+                state.loginStateRes.data = null
                 state.user = null
                 return state
             })
         )
     },
     deleteProfile: async () => {
+        set(
+            produce((state: AuthStoreState) => {
+                state.deleteProfileRes.status = "LOADING"
+                return state
+            })
+        )
         try {
-            const res = await axios.delete(`${process.env.REACT_APP_BASE_URL}/api/deleteProfile`, 
-            {
-                headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + get().token
-                }}
+            await axios.delete(`${BASE_URL}/api/auth/user`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${get().loginStateRes.data}`
+                    }
+                }
             )
             set(
-                produce((state: AuthStore) => {
-                    state.deleteProfileRes = res.data
+                produce((state: AuthStoreState) => {
+                    state.deleteProfileRes.status = "SUCCESS"
                     return state
                 })
             );
-            return res.data
-        } catch (e) {
-            console.log(e)
+        } catch (e: any) {
+            set(
+                produce((state: AuthStoreState) => {
+                    state.deleteProfileRes.status = "ERROR"
+                    return state
+                })
+            )
         }
     },
+
+    fetchLoggedUser: async (token: string) => {
+        try {
+            const resp = await axios.post(`${BASE_URL}/api/auth/user`, {
+                    "token": `Bearer ${token}`
+            })
+            set(
+                produce(state => {
+                    state.user = resp.data;
+                    return state
+                })
+            )
+        } catch (e: any) {
+            set(
+                produce(state => {
+                    state.user = null
+                    return state
+                })
+            )
+
+        }
+    }
 })
 
