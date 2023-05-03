@@ -15,7 +15,7 @@ export type AuthStoreState = {
 export type AuthActions = {
     login: (data: Login) => Promise<boolean>,
     logout: () => void,
-    deleteProfile: () => Promise<void>
+    deleteProfile: () => Promise<any>
 }
 
 export const state: AuthStoreState = {
@@ -80,11 +80,11 @@ export const authStoreSlice:  StateCreator<AppStore, [], [], AuthStore> = (set, 
             )
             set(
                 produce((state: AuthStore) => {
-                    console.log(res.data)
                     state.deleteProfileRes = res.data
                     return state
                 })
-            )
+            );
+            return res.data
         } catch (e) {
             console.log(e)
         }

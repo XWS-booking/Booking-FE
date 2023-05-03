@@ -23,7 +23,7 @@ export type AccommodationActions = {
 };
 
 export const state: AccommodationStoreState = {
-  accommodationPage: { Data: [], TotalCount: 0 },
+  accommodationPage: { data: [], totalCount: 0 },
   spinner: false,
   createAccommodationRes: null,
 };
@@ -49,7 +49,7 @@ export const accommodationStoreSlice: StateCreator<
       set(
         produce((state: AccommodationStore) => {
           state.spinner = true;
-          state.accommodationPage = { TotalCount: 0, Data: [] };
+          state.accommodationPage = { totalCount: 0, data: [] };
           return state;
         })
       );

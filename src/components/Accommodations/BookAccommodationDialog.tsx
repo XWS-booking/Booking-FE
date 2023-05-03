@@ -58,7 +58,7 @@ export const BookAccommodationDialog = ({ isOpen, onClose, accommodation } : Pro
 
   const handleGuestsChange = (event: any) => {
     const newGuests = event.target.value
-    if (newGuests >= accommodation.MinGuests && newGuests <=accommodation.MaxGuests) {
+    if (newGuests >= accommodation.minGuests && newGuests <= accommodation.maxGuests) {
         setGuests(newGuests)
         setIsGuestsValid(true)
     } else{
@@ -74,7 +74,7 @@ export const BookAccommodationDialog = ({ isOpen, onClose, accommodation } : Pro
   const isAccommodationAvailable = useApplicationStore(state => state.isAccommodationAvailable)
   const isAvailableRes = useApplicationStore(state => state.isAvailableRes)
   const checkAvailability= async () => {
-    await isAccommodationAvailable(accommodation.Id, startDate, endDate)
+    await isAccommodationAvailable(accommodation.id, startDate, endDate)
     handleNext()
   }
 
@@ -82,7 +82,7 @@ export const BookAccommodationDialog = ({ isOpen, onClose, accommodation } : Pro
   const user = useApplicationStore(state => state.user)
   const toast = useToast()
   const book = async () => {
-    await BookAccommodation({accommodationId: accommodation.Id, startDate: startDate, endDate: endDate, guests: guests, buyerId: user?.id})
+    await BookAccommodation({accommodationId: accommodation.id, startDate: startDate, endDate: endDate, guests: guests, buyerId: user?.id})
     displayToast(toast, "Reservation request has been sent!", "success");
     closeModal()
   }
@@ -131,8 +131,8 @@ export const BookAccommodationDialog = ({ isOpen, onClose, accommodation } : Pro
             
                 <Flex flexDirection='row'>
                     <FormControl>
-                        <FormLabel mb='0'>Number of guests (min: {accommodation.MinGuests}, max: {accommodation.MaxGuests})</FormLabel>
-                        <Input type='number' width="150px" min={accommodation.MinGuests} max={accommodation.MaxGuests} onChange={handleGuestsChange}></Input>
+                        <FormLabel mb='0'>Number of guests (min: {accommodation.minGuests}, max: {accommodation.maxGuests})</FormLabel>
+                        <Input type='number' width="150px" min={accommodation.minGuests} max={accommodation.maxGuests} onChange={handleGuestsChange}></Input>
                     </FormControl>
                 </Flex>
             </ModalBody>
@@ -165,7 +165,7 @@ export const BookAccommodationDialog = ({ isOpen, onClose, accommodation } : Pro
     <Modal isOpen={isOpen} onClose={closeModal} size="lg">
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Book accommodation '{accommodation.Name}'</ModalHeader>
+        <ModalHeader>Book accommodation '{accommodation.name}'</ModalHeader>
         <ModalCloseButton />
           {steps[activeStep].content}
       </ModalContent>
