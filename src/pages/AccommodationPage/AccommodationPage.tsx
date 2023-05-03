@@ -2,10 +2,10 @@ import { useEffect, useState } from "react"
 import { useApplicationStore } from "../../store/application.store"
 import { Box, Image, Badge, Text, Flex, Spinner } from "@chakra-ui/react";
 import { Accommodation } from "../../store/accommodation-store/types/accommodation.type";
-import { AccommodationCard } from "../../components/AccommodationCard";
+import { AccommodationCard } from "../../components/Accommodations/AccommodationCard";
 import "../../styles/pagination.css"
 import ReactPaginate from 'react-paginate';
-import { SearchAccommodation } from "../../components/SearchAccommodation";
+import { SearchAccommodation } from "../../components/Accommodations/SearchAccommodation";
 import { start } from "repl";
 
 export const AccommodationPage = () => {

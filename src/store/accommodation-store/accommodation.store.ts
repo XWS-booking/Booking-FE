@@ -2,7 +2,6 @@ import axios from "axios";
 import { create, StateCreator } from "zustand";
 import produce from "immer";
 import { AppStore } from "../application.store";
-import { Accommodation } from "./types/accommodation.type";
 import { AccommodationPage } from "./types/accommodation.page";
 import { CreateAccommodation } from "./types/createAccommodation.type";
 
