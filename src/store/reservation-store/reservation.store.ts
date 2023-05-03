@@ -15,7 +15,7 @@ export type ReservationActions = {
 
 export const state: ReservationStoreState = {
     bookAccommodationRes : null,
-    isAvailableRes: false
+    isAvailableRes: false,
 }
 
 export type ReservationStore = ReservationStoreState & ReservationActions

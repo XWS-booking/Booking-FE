@@ -12,6 +12,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Spinner,
 } from "@chakra-ui/react";
 import { Accommodation } from "../../store/accommodation-store/types/accommodation.type";
 import { useApplicationStore } from "../../store/application.store";
@@ -40,18 +41,18 @@ export const BookAccommodationDialog = ({ isOpen, onClose, accommodation } : Pro
       setIsDateValid(false);
     } else {
       setIsDateValid(true);
-      setStartDate(newStartDate);
     }
+    setStartDate(newStartDate);
   };
 
   const handleEndDateChange = (event: any) => {
     const newEndDate = new Date(event.target.value);
-    if (startDate > newEndDate) {
+    if (startDate > newEndDate || startDate < new Date()) {
       setIsDateValid(false);
     } else {
       setIsDateValid(true);
-      setEndDate(newEndDate);
     }
+    setEndDate(newEndDate);
   };
 
   const handleGuestsChange = (event: any) => {
