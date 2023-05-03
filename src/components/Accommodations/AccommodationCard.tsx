@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Box, Image, Badge, Text, Flex, Card, Button } from "@chakra-ui/react";
-import { Accommodation } from "../store/accommodation-store/types/accommodation.type";
+import { Accommodation } from "../../store/accommodation-store/types/accommodation.type";
 import Slider from 'react-slick';
 import { title } from "process";
 import { BookAccommodationDialog } from "./BookAccommodationDialog";

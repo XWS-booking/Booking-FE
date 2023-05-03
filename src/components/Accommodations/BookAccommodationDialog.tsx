@@ -13,8 +13,8 @@ import {
   FormControl,
   FormLabel,
 } from "@chakra-ui/react";
-import { Accommodation } from "../store/accommodation-store/types/accommodation.type";
-import { useApplicationStore } from "../store/application.store";
+import { Accommodation } from "../../store/accommodation-store/types/accommodation.type";
+import { useApplicationStore } from "../../store/application.store";
 import { useToast } from "@chakra-ui/react";
 
 interface Props {

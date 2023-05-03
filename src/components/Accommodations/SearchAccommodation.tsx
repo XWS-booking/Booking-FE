@@ -1,7 +1,7 @@
 import {Box, Button, Flex, FormControl, FormLabel, Input} from '@chakra-ui/react'
 import { useEffect, useState } from 'react';
 import { Form } from 'react-router-dom';
-import { useApplicationStore } from '../store/application.store';
+import { useApplicationStore } from '../../store/application.store';
 
 interface Props {
     sendData: (city: string, guests: number, startDate: Date, endDate: Date) => void

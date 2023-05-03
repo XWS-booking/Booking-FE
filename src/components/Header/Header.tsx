@@ -8,10 +8,11 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { CreateAccomodationForm } from "../CreateAccomodationForm/CreateAccomodationForm";
 
 export const Header = () => {
-
   const navigate = useNavigate();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <>
@@ -28,7 +29,12 @@ export const Header = () => {
             </Text>
           </Link>
         </Flex>
+        <Button onClick={onOpen}>Create accommodation</Button>
       </Box>
-      </>
+      <CreateAccomodationForm
+        isOpen={isOpen}
+        onClose={onClose}
+      ></CreateAccomodationForm>
+    </>
   );
 };
