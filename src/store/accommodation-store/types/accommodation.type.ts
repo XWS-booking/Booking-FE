@@ -1,3 +1,5 @@
+import { User } from "../../auth-store/model/user.model";
+
 export type Accommodation = {
   id: string;
   name: string;
@@ -13,5 +15,5 @@ export type Accommodation = {
   minGuests: number;
   maxGuests: number;
   pictureUrls: string[];
-  ownerId: string;
+  owner: User;
 };

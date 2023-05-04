@@ -29,7 +29,7 @@ export const AccommodationCard = ({accommodation} : Props) => {
 
     return (
         <>
-    <Card width="45vw" display="flex" flexDirection='row' mb='3'>
+    <Card width="50vw" display="flex" flexDirection='row' mb='3'>
       <Box padding='20px' width="40%">
         <Slider {...settings}>
           {accommodation.pictureUrls.map((image) => (
@@ -59,10 +59,12 @@ export const AccommodationCard = ({accommodation} : Props) => {
           <Box mt="1" fontWeight="semibold" lineHeight="tight">
             {accommodation.name}
           </Box>
-
           <Box>
             <Text mt="1" color="gray.500">
               {accommodation.street} {accommodation.streetNumber}, {accommodation.zipcode} {accommodation.city}, {accommodation.country}
+            </Text>
+            <Text mt="2">
+            Owner: {accommodation.owner.name} {accommodation.owner.surname}, {accommodation.owner.email}
             </Text>
             <Text mt="2">
               Min guests: {accommodation.minGuests} <br/>
