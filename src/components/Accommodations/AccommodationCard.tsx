@@ -61,7 +61,7 @@ export const AccommodationCard = ({accommodation} : Props) => {
           </Box>
           <Box>
             <Text mt="1" color="gray.500">
-              {accommodation.street} {accommodation.streetNumber}, {accommodation.zipcode} {accommodation.city}, {accommodation.country}
+              {accommodation.street} {accommodation.streetNumber}, {accommodation.zipCode} {accommodation.city}, {accommodation.country}
             </Text>
             <Text mt="2">
             Owner: {accommodation.owner.name} {accommodation.owner.surname}, {accommodation.owner.email}

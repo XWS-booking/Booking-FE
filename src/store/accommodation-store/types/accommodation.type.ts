@@ -6,7 +6,7 @@ export type Accommodation = {
   street: string;
   streetNumber: string;
   city: string;
-  zipcode: string;
+  zipCode: string;
   country: string;
   wifi: boolean;
   kitchen: boolean;
