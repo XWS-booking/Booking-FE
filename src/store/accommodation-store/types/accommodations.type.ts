@@ -1,6 +1,6 @@
 import { Accommodation } from "./accommodation.type"
 
-export type AccommodationPage = {
+export type AccomodationsPaginated = {
     data: Accommodation[]
     totalCount: number
 }

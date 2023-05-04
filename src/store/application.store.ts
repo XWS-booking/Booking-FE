@@ -14,8 +14,12 @@ export const useApplicationStore = create<AppStore>()(
             ...reservationStoreSlice(...a)
         })),
         {
-            partialize: ({ token, user }) => ({
-                token,
+            partialize: ({ loginStateRes, user }) => ({
+                loginStateRes: {
+                    data: loginStateRes.data,
+                    status: "IDLE",
+                    error: null
+                },
                 user,
             }),
             name: 'application-store',

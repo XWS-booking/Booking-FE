@@ -14,7 +14,6 @@ import {
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useApplicationStore } from "../../store/application.store";
-import { Accommodation } from "../../store/accommodation-store/types/accommodation.type";
 import { CreateAccommodation } from "../../store/accommodation-store/types/createAccommodation.type";
 
 interface Props {
@@ -46,13 +45,12 @@ export const CreateAccomodationForm = ({ isOpen, onClose }: Props) => {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    data.pictures = pictures;
-    await createAccommodation(data as unknown as CreateAccommodation);
+    const {pictures: pics, ...existingDate} = data
+    await createAccommodation({...existingDate, pictures: pictures ?? new FileList()});
   };
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
