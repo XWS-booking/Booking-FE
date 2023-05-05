@@ -54,8 +54,23 @@ export const CreateAccomodationForm = ({ isOpen, onClose }: Props) => {
   const createAccommodationRes = useApplicationStore(
     (state) => state.createAccommodationRes
   );
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Inputs>();
   const toast = useToast();
-  const { register, handleSubmit } = useForm<Inputs>();
+
+  useEffect(() => {
+    if (createAccommodationRes.status === 'SUCCESS') {
+      displayToast(toast, 'Successfully created accommodation!', 'success');
+      onClose();
+      return;
+    }
+    if (createAccommodationRes.status === 'ERROR') {
+      displayToast(toast, createAccommodationRes.error ?? '', 'error');
+    }
+  }, [createAccommodationRes]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const { pictures: pics, ...existingDate } = data;

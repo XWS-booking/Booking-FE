@@ -1,9 +1,16 @@
-import { Box, Button, Flex, Link, Text, useDisclosure } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Link,
+  Text,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { CreateAccomodationForm } from '../CreateAccomodationForm/CreateAccomodationForm';
 import { LoginForm } from '../Auth/LoginForm';
 import { useApplicationStore } from '../../store/application.store';
-import { RegistrationForm } from '../Auth/RegistrationForm';
 
 export const Header = () => {
   const {
@@ -41,21 +48,29 @@ export const Header = () => {
             </Text>
           </Link>
           <Flex gap='15px'>
-            {!user && (
-              <Link color={'white'} onClick={onOpenRegistration}>
-                Register
-              </Link>
-            )}
-
-            {user ? (
-              <Link color={'white'} onClick={handleLogout}>
-                Logout
-              </Link>
-            ) : (
-              <Link onClick={onOpenLogin} color={'white'}>
-                Login
-              </Link>
-            )}
+            <Flex gap='15px'>
+              {user && (
+                <Link color={'white'} onClick={handleProfileClick}>
+                  {user.name} {user.surname}
+                </Link>
+              )}
+            </Flex>
+            <Flex gap='15px'>
+              {!user && (
+                <Link color={'white'} onClick={onOpenRegistration}>
+                  Register
+                </Link>
+              )}
+              {user ? (
+                <Link color={'white'} onClick={handleLogout}>
+                  Logout
+                </Link>
+              ) : (
+                <Link onClick={onOpenLogin} color={'white'}>
+                  Login
+                </Link>
+              )}
+            </Flex>
           </Flex>
         </Flex>
         <Button onClick={() => navigate('/accommodations')} mr='5px'>
