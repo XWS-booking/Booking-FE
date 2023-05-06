@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useApplicationStore } from "../../store/application.store";
 import {
   Button,
-  Flex,
-  Spinner,
   Table,
   TableCaption,
   TableContainer,
@@ -18,7 +16,7 @@ import { Reservation } from "../../store/reservation-store/types/reservation.typ
 import { format } from "date-fns";
 import { displayToast } from "../../utils/toast.caller";
 
-export const ReservationsPage = () => {
+export const GuestReservationsPage = () => {
   const getGuestsReservations = useApplicationStore(
     (state) => state.getGuestsReservations
   );
@@ -60,7 +58,6 @@ export const ReservationsPage = () => {
   const handleDeleteReservation = async (id: string) => {
     await deleteReservation(id);
   };
-
   const handleCancelReservation = async (id: string) => {
     await cancelReservation(id);
     await getGuestsReservations();
@@ -100,11 +97,11 @@ export const ReservationsPage = () => {
                   <Td>{item.guests}</Td>
                   <Td>
                     {item.status === 0 && <>PENDING</>}{" "}
-                    {item.status === 1 && <>APPROVED</>}{" "}
+                    {item.status === 1 && <>CONFIRMED</>}{" "}
                     {item.status === 2 && <>REJECTED</>}{" "}
                     {item.status === 3 && <>CANCELED</>}
                   </Td>
-                  {item.status === 0 && (
+                  {item.status === 0 ? (
                     <Td>
                       <Button
                         colorScheme="red"
@@ -113,8 +110,10 @@ export const ReservationsPage = () => {
                         Delete
                       </Button>
                     </Td>
+                  ) : (
+                    <Td></Td>
                   )}
-                  {item.status === 1 && (
+                  {item.status === 1 ? (
                     <Td>
                       <Button
                         colorScheme="red"
@@ -123,6 +122,8 @@ export const ReservationsPage = () => {
                         Cancel
                       </Button>
                     </Td>
+                  ) : (
+                    <Td></Td>
                   )}
                 </Tr>
               ))}
