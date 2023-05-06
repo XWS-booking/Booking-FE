@@ -9,6 +9,7 @@ export type CreateAccommodation = {
   kitchen: boolean;
   airConditioner: boolean;
   freeParking: boolean;
+  autoReservation: boolean;
   minGuests: number;
   maxGuests: number;
   pictures: FileList;

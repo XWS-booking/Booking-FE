@@ -10,11 +10,12 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
+  Wrap,
+  WrapItem,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useApplicationStore } from "../../store/application.store";
-import { CreateAccommodation } from "../../store/accommodation-store/types/createAccommodation.type";
 
 interface Props {
   isOpen: boolean;
@@ -32,6 +33,7 @@ type Inputs = {
   kitchen: boolean;
   airConditioner: boolean;
   freeParking: boolean;
+  autoReservation: boolean;
   minGuests: number;
   maxGuests: number;
   pictures?: FileList | null;
@@ -42,15 +44,14 @@ export const CreateAccomodationForm = ({ isOpen, onClose }: Props) => {
   const createAccommodation = useApplicationStore(
     (state) => state.createAccommodation
   );
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>();
+  const { register, handleSubmit } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const {pictures: pics, ...existingDate} = data
-    await createAccommodation({...existingDate, pictures: pictures ?? new FileList()});
+    const { pictures: pics, ...existingDate } = data;
+    await createAccommodation({
+      ...existingDate,
+      pictures: pictures ?? new FileList(),
+    });
   };
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -95,14 +96,27 @@ export const CreateAccomodationForm = ({ isOpen, onClose }: Props) => {
               placeholder="Country"
               {...register("country")}
             ></Input>
-            <Stack spacing={5} direction="row" margin="5px 0">
-              <Checkbox {...register("wifi")}>Wifi</Checkbox>
-              <Checkbox {...register("kitchen")}>Kitchen</Checkbox>
-              <Checkbox {...register("airConditioner")}>
-                Air conditioner
-              </Checkbox>
-              <Checkbox {...register("freeParking")}>Free parking</Checkbox>
-            </Stack>
+            <Wrap spacing={5} py={"3"} direction="row" margin="5px 0">
+              <WrapItem>
+                <Checkbox {...register("wifi")}>Wifi</Checkbox>
+              </WrapItem>
+              <WrapItem>
+                <Checkbox {...register("kitchen")}>Kitchen</Checkbox>
+              </WrapItem>
+              <WrapItem>
+                <Checkbox {...register("autoReservation")}>
+                  Automatic Reservation
+                </Checkbox>
+              </WrapItem>
+              <WrapItem>
+                <Checkbox {...register("airConditioner")}>
+                  Air conditioner
+                </Checkbox>
+              </WrapItem>
+              <WrapItem>
+                <Checkbox {...register("freeParking")}>Free parking</Checkbox>
+              </WrapItem>
+            </Wrap>
             <Input
               type="number"
               placeholder="Minimum guests"

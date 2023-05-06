@@ -1,12 +1,11 @@
 import axios from "axios";
-import {create, StateCreator} from "zustand";
+import {StateCreator} from "zustand";
 import produce from "immer";
 import {AppStore} from "../application.store";
 import {AccomodationsPaginated} from "./types/accommodations.type";
 import {CreateAccommodation} from "./types/createAccommodation.type";
 import {AccomodationsFilter} from "./types/accomodations-filter.type";
 import {ResponseState} from "../response-state.type";
-import {Accommodation} from "./types/accommodation.type";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL
 
@@ -50,6 +49,7 @@ const createFormDataFromAccommodation = (accommodation: CreateAccommodation) => 
         "airConditioner",
         accommodation.airConditioner.toString()
     );
+    formData.append("autoReservation", accommodation.autoReservation.toString());
     formData.append("freeParking", accommodation.freeParking.toString());
     formData.append("minGuests", accommodation.minGuests.toString());
     formData.append("maxGuests", accommodation.maxGuests.toString());
@@ -58,7 +58,6 @@ const createFormDataFromAccommodation = (accommodation: CreateAccommodation) => 
     });
     return formData
 }
-
 
 export const accommodationStoreSlice: StateCreator<
     AppStore,
