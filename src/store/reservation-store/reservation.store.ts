@@ -284,7 +284,7 @@ export const reservationStoreSlice: StateCreator<AppStore, [], [], ReservationSt
             })
         )
         try {
-            const res = await axios.patch(`${BASE_URL}/api/reservation/reject/${id}`, 
+            const res = await axios.patch(`${BASE_URL}/api/reservation/reject`, {reservationId: id},
                 {
                     headers: {
                         "Authorization": "Bearer " + get().loginStateRes.data
@@ -315,7 +315,7 @@ export const reservationStoreSlice: StateCreator<AppStore, [], [], ReservationSt
             })
         )
         try {
-            const res = await axios.patch(`${BASE_URL}/api/reservation/confirm/${id}`, 
+            const res = await axios.patch(`${BASE_URL}/api/reservation/confirm`, {reservationId: id},
                 {
                     headers: {
                         "Authorization": "Bearer " + get().loginStateRes.data
