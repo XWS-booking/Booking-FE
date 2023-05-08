@@ -99,11 +99,13 @@ export const reservationStoreSlice: StateCreator<AppStore, [], [], ReservationSt
                     return state
                 })
             )
-        } catch (e) {
+        } catch (e: any) {
             console.log(e)
             set(
                 produce((state: ReservationStore) => {
                     state.bookAccommodationRes.status = "ERROR"
+                    state.bookAccommodationRes.data = null
+                    state.bookAccommodationRes.error = e.response.data.message
                     return state
                 })
             )

@@ -42,8 +42,8 @@ export const BookAccommodationDialog = ({
     const newStartDate = new Date(event.target.value);
     const today = new Date();
     if (
-      newStartDate.getDate() > endDate.getDate() ||
-      newStartDate.getDate() < today.getDate()
+      newStartDate > endDate ||
+      newStartDate < today
     ) {
       setIsDateValid(false);
     } else {
@@ -54,7 +54,9 @@ export const BookAccommodationDialog = ({
 
   const handleEndDateChange = (event: any) => {
     const newEndDate = new Date(event.target.value);
-    if (startDate.getDate() > newEndDate.getDate()) {
+    const today = new Date();
+    if (startDate > newEndDate ||
+      startDate < today) {
       setIsDateValid(false);
     } else {
       setIsDateValid(true);
@@ -96,6 +98,9 @@ export const BookAccommodationDialog = ({
   const BookAccommodation = useApplicationStore(
     (state) => state.bookAccommodation
   );
+  const bookAccommodationRes = useApplicationStore(
+    (state) => state.bookAccommodationRes
+  );
   const user = useApplicationStore((state) => state.user);
   const toast = useToast();
   const book = async () => {
@@ -106,7 +111,13 @@ export const BookAccommodationDialog = ({
       guests: guests,
       buyerId: user?.id,
     });
-    displayToast(toast, "Reservation request has been sent!", "success");
+    if (bookAccommodationRes.status === "SUCCESS") {
+      displayToast(toast, "Reservation request has been sent!", "success")
+    }
+    else {
+      console.log(bookAccommodationRes.error)
+      displayToast(toast, bookAccommodationRes.error ?? "", "error");
+    }
     closeModal();
   };
 
