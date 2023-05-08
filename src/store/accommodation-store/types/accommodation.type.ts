@@ -1,4 +1,5 @@
-import { User } from "../../auth-store/model/user.model";
+import { User } from '../../auth-store/model/user.model';
+import { Pricing } from './pricing.type';
 
 export type Accommodation = {
   id: string;
@@ -16,4 +17,5 @@ export type Accommodation = {
   maxGuests: number;
   pictureUrls: string[];
   owner: User;
+  pricing: Pricing[];
 };

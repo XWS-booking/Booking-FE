@@ -1,3 +1,5 @@
+import { Pricing } from './pricing.type';
+
 export type CreateAccommodation = {
   name: string;
   street: string;
@@ -13,4 +15,5 @@ export type CreateAccommodation = {
   minGuests: number;
   maxGuests: number;
   pictures: FileList;
+  pricing: Pricing[];
 };
