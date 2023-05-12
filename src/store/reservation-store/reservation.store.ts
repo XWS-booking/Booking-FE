@@ -6,6 +6,7 @@ import {ReservationRequest} from "./types/reservation-request.type"
 import {AccomodationAvailableParams} from "./types/accomodation-available.type";
 import {ResponseState} from "../response-state.type";
 import { Reservation } from "./types/reservation.type"
+import { ReservationWithCancellations } from "./types/reservation-with-cancellation.type"
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
@@ -13,7 +14,7 @@ export type ReservationStoreState = {
     bookAccommodationRes: ResponseState<any>
     isAvailableRes: ResponseState<boolean | null>
     guestsReservationsRes: ResponseState<Reservation[]>
-    ownersReservationsRes: ResponseState<Reservation[]>
+    ownersReservationsRes: ResponseState<ReservationWithCancellations[]>
     deleteReservationRes: ResponseState<null>
     confirmReservationRes: ResponseState<null>
     rejectReservationRes: ResponseState<null>
@@ -286,7 +287,7 @@ export const reservationStoreSlice: StateCreator<AppStore, [], [], ReservationSt
             })
         )
         try {
-            const res = await axios.patch(`${BASE_URL}/api/reservation/reject/${id}`, 
+            const res = await axios.patch(`${BASE_URL}/api/reservation/reject/${id}`, {},
                 {
                     headers: {
                         "Authorization": "Bearer " + get().loginStateRes.data
@@ -301,6 +302,7 @@ export const reservationStoreSlice: StateCreator<AppStore, [], [], ReservationSt
                 })
             )
         } catch (e) {
+            console.log(e)
             set(
                 produce((state: ReservationStore) => {
                     state.rejectReservationRes.status = "ERROR"
@@ -317,7 +319,7 @@ export const reservationStoreSlice: StateCreator<AppStore, [], [], ReservationSt
             })
         )
         try {
-            const res = await axios.patch(`${BASE_URL}/api/reservation/confirm/${id}`, 
+            const res = await axios.patch(`${BASE_URL}/api/reservation/confirm/${id}`,{} ,
                 {
                     headers: {
                         "Authorization": "Bearer " + get().loginStateRes.data
@@ -332,6 +334,7 @@ export const reservationStoreSlice: StateCreator<AppStore, [], [], ReservationSt
                 })
             )
         } catch (e) {
+            console.log(e)
             set(
                 produce((state: ReservationStore) => {
                     state.confirmReservationRes.status = "ERROR"
