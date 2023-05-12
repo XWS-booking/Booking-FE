@@ -6,16 +6,21 @@ import { AccomodationsPaginated } from './types/accommodations.type';
 import { CreateAccommodation } from './types/createAccommodation.type';
 import { AccomodationsFilter } from './types/accomodations-filter.type';
 import { ResponseState } from '../response-state.type';
+import { Accommodation } from './types/accommodation.type';
+import { Pricing } from './types/pricing.type';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export type AccommodationStoreState = {
   accommodationPageRes: ResponseState<AccomodationsPaginated>;
   createAccommodationRes: ResponseState<void | null>;
+  editPricingRes: ResponseState<void | null>;
 };
 export type AccommodationActions = {
   getAccommodations: (data: AccomodationsFilter) => Promise<void>;
   createAccommodation: (accommodation: CreateAccommodation) => Promise<void>;
+  getAccommodation: (id: string) => Promise<Accommodation>;
+  editPricing: (id: string, pricing: Pricing[]) => Promise<void>;
 };
 
 export const state: AccommodationStoreState = {
@@ -25,6 +30,11 @@ export const state: AccommodationStoreState = {
     data: { data: [], totalCount: 0 },
   },
   createAccommodationRes: {
+    error: null,
+    status: 'IDLE',
+    data: null,
+  },
+  editPricingRes: {
     error: null,
     status: 'IDLE',
     data: null,
@@ -136,6 +146,50 @@ export const accommodationStoreSlice: StateCreator<
       set(
         produce((state: AccommodationStoreState) => {
           state.createAccommodationRes.status = 'ERROR';
+          return state;
+        })
+      );
+    }
+  },
+  getAccommodation: async (id: string) => {
+    try {
+      const resp = await axios.get(`${BASE_URL}/api/accommodation/${id}`);
+      console.log(resp.data);
+      return resp.data;
+    } catch (e: any) {
+      console.log(e);
+      return null;
+    }
+  },
+  editPricing: async (id: string, pricing: Pricing[]) => {
+    set(
+      produce((state: AccommodationStoreState) => {
+        state.editPricingRes.status = 'LOADING';
+        return state;
+      })
+    );
+    try {
+      await axios.patch(
+        `${BASE_URL}/api/accommodation/${id}`,
+        { pricing },
+        {
+          headers: {
+            Authorization: `Bearer ${get().loginStateRes.data}`,
+          },
+        }
+      );
+      set(
+        produce((state: AccommodationStoreState) => {
+          state.editPricingRes.status = 'SUCCESS';
+          return state;
+        })
+      );
+    } catch (e: any) {
+      console.log(e);
+      set(
+        produce((state: AccommodationStoreState) => {
+          state.editPricingRes.status = 'ERROR';
+          state.editPricingRes.error = e.response.data.message;
           return state;
         })
       );

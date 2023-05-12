@@ -1,19 +1,35 @@
 import { useEffect, useState } from 'react';
-import { Box, Image, Badge, Text, Flex, Card, Button } from '@chakra-ui/react';
+import {
+  Box,
+  Image,
+  Badge,
+  Text,
+  Flex,
+  Card,
+  Button,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { Accommodation } from '../../store/accommodation-store/types/accommodation.type';
 import Slider from 'react-slick';
 import { BookAccommodationDialog } from './BookAccommodationDialog';
 import { useApplicationStore } from '../../store/application.store';
+import { EditAccommodationForm } from '../EditAccommodationForm/EditAccommodationForm';
 
 interface Props {
   accommodation: Accommodation;
+  onEditSelected?: () => void;
 }
 
-export const AccommodationCard = ({ accommodation }: Props) => {
+export const AccommodationCard = ({ accommodation, onEditSelected }: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const user = useApplicationStore((state) => state.user);
+  const handleEdit = () => {
+    if (onEditSelected) {
+      onEditSelected();
+    }
+  };
 
   const settings = {
     dots: true,
@@ -27,7 +43,21 @@ export const AccommodationCard = ({ accommodation }: Props) => {
 
   return (
     <>
-      <Card width='50vw' display='flex' flexDirection='row' mb='3'>
+      <Card
+        width='50vw'
+        display='flex'
+        flexDirection='row'
+        mb='3'
+        position={'relative'}
+      >
+        <Button
+          position={'absolute'}
+          top={'5px'}
+          right={'5px'}
+          onClick={handleEdit}
+        >
+          Edit
+        </Button>
         <Box padding='20px' width='40%'>
           <Slider {...settings}>
             {accommodation.pictureUrls?.map((image) => (

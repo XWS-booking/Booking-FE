@@ -2,7 +2,6 @@ import {
   Button,
   Checkbox,
   Flex,
-  Heading,
   Input,
   Modal,
   ModalBody,
@@ -10,61 +9,37 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Stack,
   useToast,
   Wrap,
   WrapItem,
 } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { useApplicationStore } from '../../store/application.store';
 import { AccommodationPricing } from '../Accommodations/AccommodationPricing';
-import { Pricing } from '../../store/accommodation-store/types/pricing.type';
 import { CreateAccommodationPricingButton } from '../Accommodations/CreateAccommodationPricingButton';
+import React, { useEffect, useState } from 'react';
+import { Pricing } from '../../store/accommodation-store/types/pricing.type';
+import { useApplicationStore } from '../../store/application.store';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
+import { Accommodation } from '../../store/accommodation-store/types/accommodation.type';
 import { displayToast } from '../../utils/toast.caller';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  id: string;
 }
 
-type Inputs = {
-  name: string;
-  street: string;
-  streetNumber: string;
-  city: string;
-  zipCode: string;
-  country: string;
-  wifi: boolean;
-  kitchen: boolean;
-  airConditioner: boolean;
-  freeParking: boolean;
-  autoReservation: boolean;
-  minGuests: number;
-  maxGuests: number;
-  pictures?: FileList | null;
-};
-
-export const CreateAccomodationForm = ({ isOpen, onClose }: Props) => {
-  const [pictures, setPictures] = useState<FileList | null>();
+export const EditAccommodationForm = ({ isOpen, onClose, id }: Props) => {
   const [pricing, setPricing] = useState<Pricing[]>([]);
-  const createAccommodation = useApplicationStore(
-    (state) => state.createAccommodation
-  );
-  const createAccommodationRes = useApplicationStore(
-    (state) => state.createAccommodationRes
-  );
   const toast = useToast();
-  const { register, handleSubmit } = useForm<Inputs>();
-
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const { pictures: pics, ...existingDate } = data;
-    await createAccommodation({
-      ...existingDate,
-      pictures: pictures ?? new FileList(),
-      pricing,
-    });
-  };
+  const findAccommodationById = useApplicationStore(
+    (state) => state.getAccommodation
+  );
+  const [accommodation, setAccommodation] = useState<Accommodation | null>(
+    null
+  );
+  const editPricing = useApplicationStore((state) => state.editPricing);
+  const editPricingRes = useApplicationStore((state) => state.editPricingRes);
 
   const updatePricing = (index: number, field: string, val: any) => {
     const newValues = [...pricing];
@@ -82,21 +57,38 @@ export const CreateAccomodationForm = ({ isOpen, onClose }: Props) => {
     setPricing([...pricing, newPricing]);
   };
 
-  useEffect(() => {
-    if (createAccommodationRes.status === 'SUCCESS') {
-      displayToast(toast, 'Successfully created accommodation!', 'success');
-      onClose();
-      return;
-    }
-    if (createAccommodationRes.status === 'ERROR') {
-      displayToast(toast, createAccommodationRes.error ?? '', 'error');
-    }
-  }, [createAccommodationRes]);
-
   const deletePricing = (placing: number) => {
     const newValues = pricing.filter((price, index) => index !== placing);
     setPricing(newValues);
   };
+
+  const loadAccommodation = async () => {
+    const accommodation = await findAccommodationById(id ?? '');
+    setAccommodation(accommodation);
+    setPricing(accommodation.pricing ?? []);
+  };
+
+  const onSubmit = async (e: any) => {
+    e.preventDefault();
+    await editPricing(id, pricing);
+  };
+
+  useEffect(() => {
+    if (id === '') return;
+    loadAccommodation();
+  }, [id]);
+
+  useEffect(() => {
+    if (editPricingRes.status === 'SUCCESS') {
+      displayToast(toast, 'Successfully updated pricing', 'success');
+      loadAccommodation();
+      onClose();
+      return;
+    }
+    if (editPricingRes.status === 'ERROR') {
+      displayToast(toast, editPricingRes.error ?? '', 'error');
+    }
+  }, [editPricingRes.status]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -107,7 +99,7 @@ export const CreateAccomodationForm = ({ isOpen, onClose }: Props) => {
         <ModalBody>
           <Flex gap={10}>
             <form
-              onSubmit={handleSubmit(onSubmit)}
+              onSubmit={onSubmit}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -117,73 +109,84 @@ export const CreateAccomodationForm = ({ isOpen, onClose }: Props) => {
             >
               <Input
                 type='text'
+                disabled={true}
+                value={accommodation?.name}
                 placeholder='Name'
-                {...register('name')}
               ></Input>
               <Input
                 type='text'
+                disabled={true}
+                value={accommodation?.street}
                 placeholder='Street'
-                {...register('street')}
               ></Input>
               <Input
                 type='text'
+                disabled={true}
+                value={accommodation?.streetNumber}
                 placeholder='Street number'
-                {...register('streetNumber')}
               ></Input>
               <Input
                 type='text'
+                disabled={true}
+                value={accommodation?.city}
                 placeholder='City'
-                {...register('city')}
               ></Input>
               <Input
                 type='text'
+                disabled={true}
+                value={accommodation?.zipCode}
                 placeholder='Zip code'
-                {...register('zipCode')}
               ></Input>
               <Input
                 type='text'
+                disabled={true}
+                value={accommodation?.country}
                 placeholder='Country'
-                {...register('country')}
               ></Input>
               <Wrap spacing={5} py={'3'} direction='row' margin='5px 0'>
                 <WrapItem>
-                  <Checkbox {...register('wifi')}>Wifi</Checkbox>
-                </WrapItem>
-                <WrapItem>
-                  <Checkbox {...register('kitchen')}>Kitchen</Checkbox>
-                </WrapItem>
-                <WrapItem>
-                  <Checkbox {...register('autoReservation')}>
-                    Automatic Reservation
+                  <Checkbox disabled={true} isChecked={accommodation?.wifi}>
+                    Wifi
                   </Checkbox>
                 </WrapItem>
                 <WrapItem>
-                  <Checkbox {...register('airConditioner')}>
+                  <Checkbox disabled={true} isChecked={accommodation?.kitchen}>
+                    Kitchen
+                  </Checkbox>
+                </WrapItem>
+
+                <WrapItem>
+                  <Checkbox
+                    disabled={true}
+                    isChecked={accommodation?.airConditioner}
+                  >
                     Air conditioner
                   </Checkbox>
                 </WrapItem>
                 <WrapItem>
-                  <Checkbox {...register('freeParking')}>Free parking</Checkbox>
+                  <Checkbox
+                    disabled={true}
+                    isChecked={accommodation?.freeParking}
+                  >
+                    Free parking
+                  </Checkbox>
                 </WrapItem>
               </Wrap>
               <Input
                 type='number'
+                value={accommodation?.minGuests}
+                disabled={true}
                 placeholder='Minimum guests'
-                {...register('minGuests')}
               ></Input>
               <Input
                 type='number'
+                value={accommodation?.maxGuests}
+                disabled={true}
                 placeholder='Maximum guests'
-                {...register('maxGuests')}
-              ></Input>
-              <Input
-                type='file'
-                multiple
-                onChange={(e) => setPictures(e.target.files)}
               ></Input>
               <Flex justifyContent='center'>
                 <Button type='submit' margin='15px 0'>
-                  Create accommodation
+                  Edit accommodation
                 </Button>
               </Flex>
             </form>

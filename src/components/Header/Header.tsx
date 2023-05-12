@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Flex,
-  Link,
-  Text,
-  useDisclosure,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, Link, Text, useDisclosure } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { CreateAccomodationForm } from '../CreateAccomodationForm/CreateAccomodationForm';
 import { LoginForm } from '../Auth/LoginForm';
