@@ -13,6 +13,8 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Radio,
+  RadioGroup,
   Stack,
   useToast,
 } from '@chakra-ui/react';
@@ -23,7 +25,7 @@ import {
 } from '../../utils/auth.constants';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useApplicationStore } from '../../store/application.store';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { displayToast } from '../../utils/toast.caller';
 
 export type FormValues = {
@@ -50,6 +52,7 @@ export const RegistrationForm = ({ isOpen, onOpen, onClose }: Props) => {
   const registrationStateRes = useApplicationStore(
     (state) => state.registrationStateRes
   );
+  const [role, setRole] = useState('0');
   const toast = useToast();
   const {
     register,
@@ -61,11 +64,11 @@ export const RegistrationForm = ({ isOpen, onOpen, onClose }: Props) => {
   });
 
   const handleOnSubmit = async (values: FormValues) => {
-    await registerUser(values);
+    const data = { ...values, role: +role };
+    await registerUser(data);
   };
 
   useEffect(() => {
-    console.log(registrationStateRes.status);
     if (registrationStateRes.status === 'SUCCESS') {
       displayToast(toast, 'Succesfully registered!', 'success');
       onClose();
@@ -163,6 +166,15 @@ export const RegistrationForm = ({ isOpen, onOpen, onClose }: Props) => {
                 {errors.country && (
                   <FormErrorMessage>{errors.country?.message}</FormErrorMessage>
                 )}
+              </FormControl>
+              <FormControl h={'100px'}>
+                <FormLabel>Account type</FormLabel>
+                <RadioGroup value={role} onChange={(val) => setRole(val)}>
+                  <HStack>
+                    <Radio value={'0'}>HOST</Radio>
+                    <Radio value={'1'}>GUEST</Radio>
+                  </HStack>
+                </RadioGroup>
               </FormControl>
             </Box>
           </Flex>

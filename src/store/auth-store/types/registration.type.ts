@@ -9,4 +9,5 @@ export type Registration = {
   city: string;
   zipCode: string;
   country: string;
+  role: number;
 };
