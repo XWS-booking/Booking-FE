@@ -142,10 +142,11 @@ export const accommodationStoreSlice: StateCreator<
           return state;
         })
       );
-    } catch (e) {
+    } catch (e:any) {
       set(
         produce((state: AccommodationStoreState) => {
           state.createAccommodationRes.status = 'ERROR';
+          state.createAccommodationRes.error = e.response.data
           return state;
         })
       );

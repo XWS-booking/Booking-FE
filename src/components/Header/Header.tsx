@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { CreateAccomodationForm } from '../CreateAccomodationForm/CreateAccomodationForm';
 import { LoginForm } from '../Auth/LoginForm';
 import { useApplicationStore } from '../../store/application.store';
+import { RegistrationForm } from '../Auth/RegistrationForm';
 
 export const Header = () => {
   const {
@@ -31,6 +32,9 @@ export const Header = () => {
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+  const handleProfileClick = () => {
+    navigate('/profile');
   };
 
   return (

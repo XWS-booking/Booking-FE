@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -12,11 +12,11 @@ import {
   Flex,
   FormControl,
   FormLabel,
-} from "@chakra-ui/react";
-import { Accommodation } from "../../store/accommodation-store/types/accommodation.type";
-import { useApplicationStore } from "../../store/application.store";
-import { useToast } from "@chakra-ui/react";
-import { displayToast } from "../../utils/toast.caller";
+} from '@chakra-ui/react';
+import { Accommodation } from '../../store/accommodation-store/types/accommodation.type';
+import { useApplicationStore } from '../../store/application.store';
+import { useToast } from '@chakra-ui/react';
+import { displayToast } from '../../utils/toast.caller';
 
 interface Props {
   isOpen: boolean;
@@ -32,8 +32,8 @@ export const BookAccommodationDialog = ({
   const [activeStep, setActiveStep] = useState(0);
   const handleNext = () => setActiveStep((prevStep) => prevStep + 1);
   const handlePrev = () => setActiveStep((prevStep) => prevStep - 1);
-  const [startDate, setStartDate] = useState(new Date("0001-01-01T00:00:00Z"));
-  const [endDate, setEndDate] = useState(new Date("0001-01-01T00:00:00Z"));
+  const [startDate, setStartDate] = useState(new Date('0001-01-01T00:00:00Z'));
+  const [endDate, setEndDate] = useState(new Date('0001-01-01T00:00:00Z'));
   const [guests, setGuests] = useState(0);
   const [isDateValid, setIsDateValid] = useState(false);
   const [isGuestsValid, setIsGuestsValid] = useState(false);
@@ -41,10 +41,7 @@ export const BookAccommodationDialog = ({
   const handleStartDateChange = (event: any) => {
     const newStartDate = new Date(event.target.value);
     const today = new Date();
-    if (
-      newStartDate > endDate ||
-      newStartDate < today
-    ) {
+    if (newStartDate > endDate || newStartDate < today) {
       setIsDateValid(false);
     } else {
       setIsDateValid(true);
@@ -55,8 +52,7 @@ export const BookAccommodationDialog = ({
   const handleEndDateChange = (event: any) => {
     const newEndDate = new Date(event.target.value);
     const today = new Date();
-    if (startDate > newEndDate ||
-      startDate < today) {
+    if (startDate > newEndDate || startDate < today) {
       setIsDateValid(false);
     } else {
       setIsDateValid(true);
@@ -111,48 +107,47 @@ export const BookAccommodationDialog = ({
       guests: guests,
       buyerId: user?.id,
     });
-    if (bookAccommodationRes.status === "SUCCESS") {
-      displayToast(toast, "Reservation request has been sent!", "success")
-    }
-    else {
-      console.log(bookAccommodationRes.error)
-      displayToast(toast, bookAccommodationRes.error ?? "", "error");
+    if (bookAccommodationRes.status === 'SUCCESS') {
+      displayToast(toast, 'Reservation request has been sent!', 'success');
+    } else {
+      console.log(bookAccommodationRes.error);
+      displayToast(toast, bookAccommodationRes.error ?? '', 'error');
     }
     closeModal();
   };
 
   const closeModal = () => {
     setActiveStep(0);
-    setStartDate(new Date("0001-01-01T00:00:00Z"));
-    setEndDate(new Date("0001-01-01T00:00:00Z"));
+    setStartDate(new Date('0001-01-01T00:00:00Z'));
+    setEndDate(new Date('0001-01-01T00:00:00Z'));
     setIsDateValid(false);
     setIsGuestsValid(false);
     onClose();
   };
 
   const steps = [
-    { label: "Choose Dates", content: renderDateForm() },
-    { label: "Choose Guests", content: renderGuestsForm() },
+    { label: 'Choose Dates', content: renderDateForm() },
+    { label: 'Choose Guests', content: renderGuestsForm() },
   ];
 
   function renderDateForm() {
     return (
       <>
         <ModalBody>
-          <Flex flexDirection="row">
+          <Flex flexDirection='row'>
             <FormControl>
-              <FormLabel mb="0">Start Date</FormLabel>
-              <Input type="date" onChange={handleStartDateChange}></Input>
+              <FormLabel mb='0'>Start Date</FormLabel>
+              <Input type='date' onChange={handleStartDateChange}></Input>
             </FormControl>
             <FormControl>
-              <FormLabel mb="0">End Date</FormLabel>
-              <Input type="date" onChange={handleEndDateChange}></Input>
+              <FormLabel mb='0'>End Date</FormLabel>
+              <Input type='date' onChange={handleEndDateChange}></Input>
             </FormControl>
           </Flex>
         </ModalBody>
         <ModalFooter>
           <Button
-            colorScheme="blue"
+            colorScheme='blue'
             mr={3}
             onClick={checkAvailability}
             isDisabled={!isDateValid}
@@ -170,15 +165,15 @@ export const BookAccommodationDialog = ({
         {isAvailableRes.data === true && (
           <>
             <ModalBody>
-              <Flex flexDirection="row">
+              <Flex flexDirection='row'>
                 <FormControl>
-                  <FormLabel mb="0">
-                    Number of guests (min: {accommodation.minGuests}, max:{" "}
+                  <FormLabel mb='0'>
+                    Number of guests (min: {accommodation.minGuests}, max:{' '}
                     {accommodation.maxGuests})
                   </FormLabel>
                   <Input
-                    type="number"
-                    width="150px"
+                    type='number'
+                    width='150px'
                     min={accommodation.minGuests}
                     max={accommodation.maxGuests}
                     onChange={handleGuestsChange}
@@ -187,11 +182,11 @@ export const BookAccommodationDialog = ({
               </Flex>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme="gray" mr={3} onClick={cleanDates}>
+              <Button colorScheme='gray' mr={3} onClick={cleanDates}>
                 Previous
               </Button>
               <Button
-                colorScheme="blue"
+                colorScheme='blue'
                 mr={3}
                 onClick={book}
                 isDisabled={!isGuestsValid}
@@ -201,14 +196,14 @@ export const BookAccommodationDialog = ({
             </ModalFooter>
           </>
         )}
-        {isAvailableRes.data === false && (
+        {!isAvailableRes.data && (
           <>
             <ModalBody>
               Sorry, the accommodation is not available in the selected time
               range.
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme="gray" mr={3} onClick={cleanDates}>
+              <Button colorScheme='gray' mr={3} onClick={cleanDates}>
                 Previous
               </Button>
             </ModalFooter>
@@ -219,7 +214,7 @@ export const BookAccommodationDialog = ({
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={closeModal} size="lg">
+    <Modal isOpen={isOpen} onClose={closeModal} size='lg'>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Book accommodation '{accommodation.name}'</ModalHeader>

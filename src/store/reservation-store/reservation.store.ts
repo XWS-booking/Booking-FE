@@ -93,6 +93,7 @@ export const reservationStoreSlice: StateCreator<AppStore, [], [], ReservationSt
                     }
                 }
             )
+            console.log(res.data)
             set(
                 produce((state: ReservationStore) => {
                     state.bookAccommodationRes.status = "SUCCESS"

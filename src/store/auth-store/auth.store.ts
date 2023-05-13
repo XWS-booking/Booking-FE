@@ -183,6 +183,7 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (
   },
 
   updatePersonalInfo: async (user: User) => {
+    console.log(user)
     set(
       produce((state: AuthStoreState) => {
         state.updatePersonalInfoRes.status = "LOADING";
