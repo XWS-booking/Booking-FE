@@ -50,14 +50,16 @@ export const AccommodationCard = ({ accommodation, onEditSelected }: Props) => {
         mb='3'
         position={'relative'}
       >
-        <Button
-          position={'absolute'}
-          top={'5px'}
-          right={'5px'}
-          onClick={handleEdit}
-        >
-          Edit
-        </Button>
+        {user?.role == 1 && (
+          <Button
+            position={'absolute'}
+            top={'5px'}
+            right={'5px'}
+            onClick={handleEdit}
+          >
+            Edit
+          </Button>
+        )}
         <Box padding='20px' width='40%'>
           <Slider {...settings}>
             {accommodation.pictureUrls?.map((image) => (

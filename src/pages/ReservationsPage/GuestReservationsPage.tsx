@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useApplicationStore } from "../../store/application.store";
+import { useEffect, useState } from 'react';
+import { useApplicationStore } from '../../store/application.store';
 import {
   Button,
   Table,
@@ -11,10 +11,10 @@ import {
   Thead,
   Tr,
   useToast,
-} from "@chakra-ui/react";
-import { Reservation } from "../../store/reservation-store/types/reservation.type";
-import { format } from "date-fns";
-import { displayToast } from "../../utils/toast.caller";
+} from '@chakra-ui/react';
+import { Reservation } from '../../store/reservation-store/types/reservation.type';
+import { format } from 'date-fns';
+import { displayToast } from '../../utils/toast.caller';
 
 export const GuestReservationsPage = () => {
   const getGuestsReservations = useApplicationStore(
@@ -36,18 +36,23 @@ export const GuestReservationsPage = () => {
     (state) => state.cancelReservationRes
   );
   const toast = useToast();
+  const [canDisplay, setCanDisplay] = useState(false);
 
   useEffect(() => {
+    setCanDisplay(true);
     fetchReservations();
   }, [deleteReservationRes]);
 
   useEffect(() => {
-    if (cancelReservationRes.status === "SUCCESS") {
-      displayToast(toast, "Reservation successfully canceled!", "success");
-      return;
-    }
-    if (cancelReservationRes.status === "ERROR") {
-      displayToast(toast, cancelReservationRes.error ?? "", "error");
+    if (canDisplay) {
+      if (cancelReservationRes.status === 'SUCCESS') {
+        displayToast(toast, 'Reservation successfully canceled!', 'success');
+        return;
+      }
+      if (cancelReservationRes.status === 'ERROR') {
+        displayToast(toast, cancelReservationRes.error ?? '', 'error');
+      }
+      setCanDisplay(false);
     }
   }, [cancelReservationRes]);
 
@@ -66,7 +71,7 @@ export const GuestReservationsPage = () => {
   return (
     <>
       <TableContainer flex={1}>
-        <Table variant="striped" colorScheme="teal">
+        <Table variant='striped' colorScheme='teal'>
           <TableCaption>Reservations</TableCaption>
           <Thead>
             <Tr>
@@ -84,47 +89,45 @@ export const GuestReservationsPage = () => {
                 <Tr key={item.id}>
                   <Td>{item.accommodation.name}</Td>
                   <Td>
-                    {item.accommodation.street}{" "}
-                    {item.accommodation.streetNumber} {item.accommodation.city},{" "}
+                    {item.accommodation.street}{' '}
+                    {item.accommodation.streetNumber} {item.accommodation.city},{' '}
                     {item.accommodation.country}
                   </Td>
                   <Td>
-                    {format(new Date(item.startDate), "dd-MM-yyyy").toString()}
+                    {format(new Date(item.startDate), 'dd-MM-yyyy').toString()}
                   </Td>
                   <Td>
-                    {format(new Date(item.endDate), "dd-MM-yyyy").toString()}
+                    {format(new Date(item.endDate), 'dd-MM-yyyy').toString()}
                   </Td>
                   <Td>{item.guests}</Td>
                   <Td>
-                    {item.status === 0 && <>PENDING</>}{" "}
-                    {item.status === 1 && <>CONFIRMED</>}{" "}
-                    {item.status === 2 && <>REJECTED</>}{" "}
+                    {item.status === 0 && <>PENDING</>}{' '}
+                    {item.status === 1 && <>CONFIRMED</>}{' '}
+                    {item.status === 2 && <>REJECTED</>}{' '}
                     {item.status === 3 && <>CANCELED</>}
                   </Td>
-                  {item.status === 0 ? (
+                  {item.status === 0 && (
                     <Td>
                       <Button
-                        colorScheme="red"
+                        colorScheme='red'
                         onClick={() => handleDeleteReservation(item.id)}
                       >
                         Delete
                       </Button>
                     </Td>
-                  ) : (
-                    <Td></Td>
                   )}
-                  {item.status === 1 ? (
+                  {item.status === 1 && (
                     <Td>
                       <Button
-                        colorScheme="red"
+                        colorScheme='red'
                         onClick={() => handleCancelReservation(item.id)}
                       >
                         Cancel
                       </Button>
                     </Td>
-                  ) : (
-                    <Td></Td>
                   )}
+                  {item.status === 2 && <Td></Td>}
+                  {item.status === 3 && <Td></Td>}
                 </Tr>
               ))}
           </Tbody>

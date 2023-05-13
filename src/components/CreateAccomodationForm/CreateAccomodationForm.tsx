@@ -48,17 +48,37 @@ type Inputs = {
 export const CreateAccomodationForm = ({ isOpen, onClose }: Props) => {
   const [pictures, setPictures] = useState<FileList | null>();
   const [pricing, setPricing] = useState<Pricing[]>([]);
+  const [canDisplay, setCanDisplay] = useState(false);
   const createAccommodation = useApplicationStore(
     (state) => state.createAccommodation
   );
   const createAccommodationRes = useApplicationStore(
     (state) => state.createAccommodationRes
   );
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Inputs>();
   const toast = useToast();
-  const { register, handleSubmit } = useForm<Inputs>();
+
+  useEffect(() => {
+    if (canDisplay) {
+      if (createAccommodationRes.status === 'SUCCESS') {
+        displayToast(toast, 'Successfully created accommodation!', 'success');
+        onClose();
+        return;
+      }
+      if (createAccommodationRes.status === 'ERROR') {
+        displayToast(toast, createAccommodationRes.error ?? '', 'error');
+      }
+      setCanDisplay(false);
+    }
+  }, [createAccommodationRes]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const { pictures: pics, ...existingDate } = data;
+    setCanDisplay(true);
     await createAccommodation({
       ...existingDate,
       pictures: pictures ?? new FileList(),

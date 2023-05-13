@@ -6,6 +6,7 @@ import { User } from './model/user.model';
 import { Login } from './types/login.type';
 import { ResponseState } from '../response-state.type';
 import { Registration } from './types/registration.type';
+import { ChangePassword } from "./types/changePassword.type";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
@@ -14,6 +15,8 @@ export type AuthStoreState = {
   deleteProfileRes: ResponseState<void[]>;
   loginStateRes: ResponseState<string | null>;
   registrationStateRes: ResponseState<void[]>;
+  updatePersonalInfoRes: ResponseState<User | null>;
+  changePasswordRes: ResponseState<void[]>;
 };
 
 export type AuthActions = {
@@ -22,13 +25,15 @@ export type AuthActions = {
   register: (register: Registration) => void;
   deleteProfile: () => Promise<void>;
   fetchLoggedUser: (token: string) => Promise<void>;
+  updatePersonalInfo: (user: User) => Promise<void>;
+  changePassword: (info: ChangePassword) => Promise<void>;
 };
 
 export const state: AuthStoreState = {
   user: null,
   deleteProfileRes: {
     data: [],
-    status: 'IDLE',
+    status: "IDLE",
     error: null,
   },
   loginStateRes: {
@@ -39,6 +44,16 @@ export const state: AuthStoreState = {
   registrationStateRes: {
     data: [],
     status: 'IDLE',
+    error: null,
+  },
+  updatePersonalInfoRes: {
+    data: null,
+    status: "IDLE",
+    error: null,
+  },
+  changePasswordRes: {
+    data: [],
+    status: "IDLE",
     error: null,
   },
 };
@@ -161,6 +176,77 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (
       set(
         produce((state) => {
           state.user = null;
+          return state;
+        })
+      );
+    }
+  },
+
+  updatePersonalInfo: async (user: User) => {
+    console.log(user)
+    set(
+      produce((state: AuthStoreState) => {
+        state.updatePersonalInfoRes.status = "LOADING";
+        return state;
+      })
+    );
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/api/auth/personal/update`,
+        user,
+        {
+          headers: {
+            Authorization: `Bearer ${get().loginStateRes.data}`,
+          },
+        }
+      );
+      set(
+        produce((state: AuthStoreState) => {
+          state.updatePersonalInfoRes.status = "SUCCESS";
+          state.updatePersonalInfoRes.data = res.data;
+          return state;
+        })
+      );
+    } catch (e: any) {
+      set(
+        produce((state: AuthStoreState) => {
+          state.updatePersonalInfoRes.status = "ERROR";
+          state.updatePersonalInfoRes.error = e.response.data.message;
+          return state;
+        })
+      );
+    }
+  },
+
+  changePassword: async (info: ChangePassword) => {
+    set(
+      produce((state: AuthStoreState) => {
+        state.changePasswordRes.status = "LOADING";
+        return state;
+      })
+    );
+    try {
+      const res = await axios.patch(
+        `${BASE_URL}/api/auth/password/change`,
+        info,
+        {
+          headers: {
+            Authorization: `Bearer ${get().loginStateRes.data}`,
+          },
+        }
+      );
+      set(
+        produce((state: AuthStoreState) => {
+          state.changePasswordRes.status = "SUCCESS";
+          state.changePasswordRes.data = res.data;
+          return state;
+        })
+      );
+    } catch (e: any) {
+      set(
+        produce((state: AuthStoreState) => {
+          state.changePasswordRes.status = "ERROR";
+          state.changePasswordRes.error = e.response.data.message;
           return state;
         })
       );
