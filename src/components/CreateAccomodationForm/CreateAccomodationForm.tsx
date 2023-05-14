@@ -53,12 +53,12 @@ export const CreateAccomodationForm = ({ isOpen, onClose }: Props) => {
   const createAccommodationRes = useApplicationStore(
     (state) => state.createAccommodationRes
   );
+  const user = useApplicationStore((state) => state.user);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>();
-  const toast = useToast();
 
   useEffect(() => {
     if (createAccommodationRes.status === 'SUCCESS') {

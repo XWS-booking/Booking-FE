@@ -9,6 +9,7 @@ import { ResponseState } from '../response-state.type';
 import { Accommodation } from './types/accommodation.type';
 import { Pricing } from './types/pricing.type';
 import { toast } from 'react-toastify';
+import { GetBookingPrice } from './types/get-booking-price.type';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
@@ -22,6 +23,7 @@ export type AccommodationActions = {
   createAccommodation: (accommodation: CreateAccommodation) => Promise<void>;
   getAccommodation: (id: string) => Promise<Accommodation>;
   editPricing: (id: string, pricing: Pricing[]) => Promise<void>;
+  getBookingPrice: (id: string, data: GetBookingPrice) => Promise<number>;
 };
 
 export const state: AccommodationStoreState = {
@@ -200,6 +202,23 @@ export const accommodationStoreSlice: StateCreator<
           return state;
         })
       );
+    }
+  },
+  getBookingPrice: async (id: string, data: GetBookingPrice) => {
+    try {
+      const resp = await axios.post(
+        `${BASE_URL}/api/accommodation/${id}/price`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${get().loginStateRes.data}`,
+          },
+        }
+      );
+      return resp.data.price;
+    } catch (e: any) {
+      console.log(e);
+      return 0;
     }
   },
 });

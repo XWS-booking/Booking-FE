@@ -12,75 +12,77 @@ import { toast } from 'react-toastify';
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export type ReservationStoreState = {
-    bookAccommodationRes: ResponseState<any>
-    isAvailableRes: ResponseState<boolean | null>
-    guestsReservationsRes: ResponseState<Reservation[]>
-    ownersReservationsRes: ResponseState<ReservationWithCancellations[]>
-    deleteReservationRes: ResponseState<null>
-    confirmReservationRes: ResponseState<null>
-    rejectReservationRes: ResponseState<null>
-    cancelReservationRes: ResponseState<any>
-    accommodationsReservationsRes: ResponseState<Reservation[]>
-}
+  bookAccommodationRes: ResponseState<any>;
+  isAvailableRes: ResponseState<boolean | null>;
+  guestsReservationsRes: ResponseState<Reservation[]>;
+  ownersReservationsRes: ResponseState<ReservationWithCancellations[]>;
+  deleteReservationRes: ResponseState<null>;
+  confirmReservationRes: ResponseState<null>;
+  rejectReservationRes: ResponseState<null>;
+  cancelReservationRes: ResponseState<any>;
+  accommodationsReservationsRes: ResponseState<Reservation[]>;
+};
 export type ReservationActions = {
-    bookAccommodation: (reservation: ReservationRequest) => Promise<void>
-    isAccommodationAvailable: (params: AccomodationAvailableParams) => Promise<void>
-    getGuestsReservations: () => Promise<void>
-    getOwnersReservations: () => Promise<void>
-    deleteReservation: (id: string) => Promise<void>
-    confirmReservation: (id: string) => Promise<void>
-    rejectReservation: (id: string) => Promise<void>
-    cancelReservation: (id: string) => Promise<void>;
-    getAccommodationsReservations: (id: string) => Promise<void>
-}
+  bookAccommodation: (reservation: ReservationRequest) => Promise<void>;
+  isAccommodationAvailable: (
+    params: AccomodationAvailableParams
+  ) => Promise<void>;
+  getGuestsReservations: () => Promise<void>;
+  getOwnersReservations: () => Promise<void>;
+  deleteReservation: (id: string) => Promise<void>;
+  confirmReservation: (id: string) => Promise<void>;
+  rejectReservation: (id: string) => Promise<void>;
+  cancelReservation: (id: string) => Promise<void>;
+  getAccommodationsReservations: (id: string) => Promise<void>;
+};
 
 export const state: ReservationStoreState = {
-    bookAccommodationRes: {
-        data: null,
-        status: "IDLE",
-        error: null
-    },
-    isAvailableRes: {
-        data: null,
-        status: "IDLE",
-        error: null
-    },
-    guestsReservationsRes: {
-        data: [],
-        status: "IDLE",
-        error: null
-    },
-    ownersReservationsRes: {
-        data: [],
-        status: "IDLE",
-        error: null
-    },
-    deleteReservationRes: {
-        data: null,
-        status: "IDLE",
-        error: null
-    },
-    confirmReservationRes: {
-        data: null,
-        status: "IDLE",
-        error: null
-    },
-    rejectReservationRes: {
-        data: null,
-        status: "IDLE",
-        error: null
-    },
-    cancelReservationRes: {
-        data: null,
-        status: "IDLE",
-        error: null,
-    },
-    accommodationsReservationsRes: {
-        data: [],
-        status: "IDLE",
-        error: null,
-    },
-}
+  bookAccommodationRes: {
+    data: null,
+    status: 'IDLE',
+    error: null,
+  },
+  isAvailableRes: {
+    data: null,
+    status: 'IDLE',
+    error: null,
+  },
+  guestsReservationsRes: {
+    data: [],
+    status: 'IDLE',
+    error: null,
+  },
+  ownersReservationsRes: {
+    data: [],
+    status: 'IDLE',
+    error: null,
+  },
+  deleteReservationRes: {
+    data: null,
+    status: 'IDLE',
+    error: null,
+  },
+  confirmReservationRes: {
+    data: null,
+    status: 'IDLE',
+    error: null,
+  },
+  rejectReservationRes: {
+    data: null,
+    status: 'IDLE',
+    error: null,
+  },
+  cancelReservationRes: {
+    data: null,
+    status: 'IDLE',
+    error: null,
+  },
+  accommodationsReservationsRes: {
+    data: [],
+    status: 'IDLE',
+    error: null,
+  },
+};
 
 export type ReservationStore = ReservationStoreState & ReservationActions;
 
@@ -357,36 +359,36 @@ export const reservationStoreSlice: StateCreator<
     }
   },
   getAccommodationsReservations: async (id: string) => {
+    set(
+      produce((state: ReservationStore) => {
+        state.accommodationsReservationsRes.status = 'LOADING';
+        return state;
+      })
+    );
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/api/reservations/accommodation/${id}`,
+        {
+          headers: {
+            Authorization: 'Bearer ' + get().loginStateRes.data,
+          },
+        }
+      );
       set(
-          produce((state: ReservationStore) => {
-              state.accommodationsReservationsRes.status = "LOADING"
-              return state
-          })
-      )
-      try {
-          const res = await axios.get(`${BASE_URL}/api/reservations/accommodation/${id}`, 
-              {
-                  headers: {
-                      "Authorization": "Bearer " + get().loginStateRes.data
-                  }
-              }
-          )
-          set(
-              produce((state: ReservationStore) => {
-                  state.accommodationsReservationsRes.status = "SUCCESS"
-                  state.accommodationsReservationsRes.data = res.data
-                  console.log(state.accommodationsReservationsRes.data)
-                  return state
-              })
-          )
-      } catch (e) {
-          set(
-              produce((state: ReservationStore) => {
-                  console.log("error")
-                  state.accommodationsReservationsRes.status = "ERROR"
-                  return state
-              })
-          )
-      }
-  }
+        produce((state: ReservationStore) => {
+          state.accommodationsReservationsRes.status = 'SUCCESS';
+          state.accommodationsReservationsRes.data = res.data ?? [];
+          return state;
+        })
+      );
+    } catch (e) {
+      set(
+        produce((state: ReservationStore) => {
+          console.log('error');
+          state.accommodationsReservationsRes.status = 'ERROR';
+          return state;
+        })
+      );
+    }
+  },
 });

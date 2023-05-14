@@ -12,6 +12,7 @@ export interface Props {
   onFromChange: (from: Date) => void;
   onToChange: (to: Date) => void;
   onDelete: () => void;
+  showDelete?: boolean;
 }
 
 export const AccommodationPricing = ({
@@ -24,6 +25,7 @@ export const AccommodationPricing = ({
   onPriceChange,
   onToChange,
   onDelete,
+  showDelete = true,
 }: Props) => {
   const formatDate = (date: Date) => {
     return moment(date).format('YYYY-MM-DD');
@@ -72,9 +74,11 @@ export const AccommodationPricing = ({
           onChange={(e) => onPriceChange(+e.target.value)}
         />
       </Flex>
-      <Button background={'red'} color={'white'} onClick={() => onDelete()}>
-        Remove pricing
-      </Button>
+      {showDelete && (
+        <Button background={'red'} color={'white'} onClick={() => onDelete()}>
+          Remove pricing
+        </Button>
+      )}
     </Flex>
   );
 };

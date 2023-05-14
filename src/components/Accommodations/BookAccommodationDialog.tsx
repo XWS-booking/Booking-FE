@@ -12,6 +12,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Text,
 } from '@chakra-ui/react';
 import { Accommodation } from '../../store/accommodation-store/types/accommodation.type';
 import { useApplicationStore } from '../../store/application.store';
@@ -37,29 +38,42 @@ export const BookAccommodationDialog = ({
   const [guests, setGuests] = useState(0);
   const [isDateValid, setIsDateValid] = useState(false);
   const [isGuestsValid, setIsGuestsValid] = useState(false);
+  const [currentPrice, setCurrentPrice] = useState(0);
 
-
-  const getAccommodationsReservations = useApplicationStore((state) => state.getAccommodationsReservations)
-  const accommodationsReservationsRes = useApplicationStore((state) => state.accommodationsReservationsRes)
+  const getAccommodationsReservations = useApplicationStore(
+    (state) => state.getAccommodationsReservations
+  );
+  const accommodationsReservationsRes = useApplicationStore(
+    (state) => state.accommodationsReservationsRes
+  );
+  const getBookingPrice = useApplicationStore((state) => state.getBookingPrice);
 
   useEffect(() => {
-    fetchAccommodationsReservations()
-  }, [])
+    fetchAccommodationsReservations();
+  }, []);
 
   const fetchAccommodationsReservations = async () => {
     await getAccommodationsReservations(accommodation.id);
   };
 
   const filterDate = (date: Date) => {
-    if (accommodationsReservationsRes.status == "IDLE") filterDate(date)
+    if (accommodationsReservationsRes.status == 'IDLE') filterDate(date);
     for (const range of accommodationsReservationsRes.data) {
-      if (date >= new Date(range.startDate) && date <= new Date(range.endDate) && range.status == 1) {
+      if (
+        date >= adjustTimezoneNegative(new Date(range.startDate)) &&
+        date <= adjustTimezoneNegative(new Date(range.endDate)) &&
+        range.status == 1
+      ) {
         return false;
       }
     }
-    return true; 
+    return accommodation.pricing.some((price) => {
+      return (
+        date >= adjustTimezoneNegative(new Date(price.from)) &&
+        date <= adjustTimezoneNegative(new Date(price.to))
+      );
+    });
   };
-
 
   const handleStartDateChange = (newStartDate: Date) => {
     if (newStartDate > endDate) {
@@ -110,6 +124,17 @@ export const BookAccommodationDialog = ({
     handleNext();
   };
 
+  const checkBookingPrice = async () => {
+    const body = {
+      from: adjustTimezone(startDate),
+      to: adjustTimezone(endDate),
+      guests: +guests,
+    };
+    const price = await getBookingPrice(accommodation.id, body);
+    setCurrentPrice(price);
+    handleNext();
+  };
+
   const BookAccommodation = useApplicationStore(
     (state) => state.bookAccommodation
   );
@@ -134,10 +159,52 @@ export const BookAccommodationDialog = ({
     onClose();
   };
 
+  const formatDate = (date: Date) => {
+    return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+  };
+  const adjustTimezone = (date: Date) => {
+    const localOffset = -date.getTimezoneOffset() * 60000;
+    date.setTime(date.getTime() + localOffset);
+    return date;
+  };
+  const adjustTimezoneNegative = (date: Date) => {
+    const localOffset = -date.getTimezoneOffset() * 60000;
+    date.setTime(date.getTime() - localOffset);
+    return date;
+  };
+
   const steps = [
     { label: 'Choose Dates', content: renderDateForm() },
     { label: 'Choose Guests', content: renderGuestsForm() },
+    { label: 'Price', content: renderPrice() },
   ];
+
+  function renderPrice() {
+    return (
+      <>
+        <ModalBody>
+          <Text>{`Date Range: : ${formatDate(startDate)} - ${formatDate(
+            endDate
+          )}`}</Text>
+          <Text>{`Guests: ${guests}`}</Text>
+          <Text>{`Price: ${currentPrice}€ `}</Text>
+        </ModalBody>
+        <ModalFooter>
+          <Button colorScheme='gray' mr={3} onClick={cleanDates}>
+            Previous
+          </Button>
+          <Button
+            colorScheme='blue'
+            mr={3}
+            onClick={book}
+            isDisabled={!isGuestsValid}
+          >
+            Book
+          </Button>
+        </ModalFooter>
+      </>
+    );
+  }
 
   function renderDateForm() {
     return (
@@ -146,7 +213,7 @@ export const BookAccommodationDialog = ({
           <Flex flexDirection='row'>
             <FormControl>
               <FormLabel mb='0'>Start Date</FormLabel>
-               <DatePicker
+              <DatePicker
                 inline
                 filterDate={filterDate}
                 onChange={handleStartDateChange}
@@ -207,10 +274,10 @@ export const BookAccommodationDialog = ({
               <Button
                 colorScheme='blue'
                 mr={3}
-                onClick={book}
+                onClick={checkBookingPrice}
                 isDisabled={!isGuestsValid}
               >
-                Book
+                Next
               </Button>
             </ModalFooter>
           </>
