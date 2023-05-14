@@ -18,10 +18,7 @@ import { CreateAccommodationPricingButton } from '../Accommodations/CreateAccomm
 import React, { useEffect, useState } from 'react';
 import { Pricing } from '../../store/accommodation-store/types/pricing.type';
 import { useApplicationStore } from '../../store/application.store';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
 import { Accommodation } from '../../store/accommodation-store/types/accommodation.type';
-import { displayToast } from '../../utils/toast.caller';
 
 interface Props {
   isOpen: boolean;
@@ -31,7 +28,6 @@ interface Props {
 
 export const EditAccommodationForm = ({ isOpen, onClose, id }: Props) => {
   const [pricing, setPricing] = useState<Pricing[]>([]);
-  const toast = useToast();
   const findAccommodationById = useApplicationStore(
     (state) => state.getAccommodation
   );
@@ -80,13 +76,9 @@ export const EditAccommodationForm = ({ isOpen, onClose, id }: Props) => {
 
   useEffect(() => {
     if (editPricingRes.status === 'SUCCESS') {
-      displayToast(toast, 'Successfully updated pricing', 'success');
       loadAccommodation();
       onClose();
       return;
-    }
-    if (editPricingRes.status === 'ERROR') {
-      displayToast(toast, editPricingRes.error ?? '', 'error');
     }
   }, [editPricingRes.status]);
 

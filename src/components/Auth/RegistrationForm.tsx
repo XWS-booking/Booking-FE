@@ -26,7 +26,6 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useApplicationStore } from '../../store/application.store';
 import { useEffect, useState } from 'react';
-import { displayToast } from '../../utils/toast.caller';
 
 export type FormValues = {
   email: string;
@@ -52,8 +51,7 @@ export const RegistrationForm = ({ isOpen, onOpen, onClose }: Props) => {
   const registrationStateRes = useApplicationStore(
     (state) => state.registrationStateRes
   );
-  const [role, setRole] = useState('0');
-  const toast = useToast();
+  const [role, setRole] = useState('1');
   const {
     register,
     handleSubmit,
@@ -70,13 +68,7 @@ export const RegistrationForm = ({ isOpen, onOpen, onClose }: Props) => {
 
   useEffect(() => {
     if (registrationStateRes.status === 'SUCCESS') {
-      displayToast(toast, 'Succesfully registered!', 'success');
       onClose();
-      return;
-    }
-    if (registrationStateRes.status === 'ERROR') {
-      displayToast(toast, registrationStateRes.error ?? '', 'error');
-      return;
     }
   }, [registrationStateRes]);
 
@@ -171,8 +163,8 @@ export const RegistrationForm = ({ isOpen, onOpen, onClose }: Props) => {
                 <FormLabel>Account type</FormLabel>
                 <RadioGroup value={role} onChange={(val) => setRole(val)}>
                   <HStack>
-                    <Radio value={'0'}>HOST</Radio>
-                    <Radio value={'1'}>GUEST</Radio>
+                    <Radio value={'1'}>HOST</Radio>
+                    <Radio value={'0'}>GUEST</Radio>
                   </HStack>
                 </RadioGroup>
               </FormControl>

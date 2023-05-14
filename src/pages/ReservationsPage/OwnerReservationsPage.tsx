@@ -41,16 +41,13 @@ export const OwnerReservationsPage = () => {
   };
   useEffect(() => {
     fetchReservations();
-    console.log(ownersReservationsRes);
   }, [rejectReservationRes, confirmReservationRes]);
 
   const handleConfirmReservation = async (id: string) => {
-    console.log('confirm!');
     await confirmReservation(id);
   };
 
   const handleRejectReservation = async (id: string) => {
-    console.log('reject!');
     await rejectReservation(id);
   };
 

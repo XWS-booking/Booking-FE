@@ -9,11 +9,10 @@ import {
   ModalHeader,
   ModalOverlay,
   useToast,
-} from "@chakra-ui/react";
-import React, { useEffect } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { useApplicationStore } from "../../store/application.store";
-import { displayToast } from "../../utils/toast.caller";
+} from '@chakra-ui/react';
+import React, { useEffect } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { useApplicationStore } from '../../store/application.store';
 
 type Inputs = {
   oldPassword: string;
@@ -31,7 +30,6 @@ export const ChangePasswordForm = ({ isOpen, onClose }: Props) => {
     (state) => state.changePasswordRes
   );
   const user = useApplicationStore((state) => state.user);
-  const toast = useToast();
   const {
     register,
     handleSubmit,
@@ -39,20 +37,16 @@ export const ChangePasswordForm = ({ isOpen, onClose }: Props) => {
   } = useForm<Inputs>();
 
   useEffect(() => {
-    if (changePasswordRes.status === "SUCCESS") {
-      displayToast(toast, "Password successfully changed!", "success");
+    if (changePasswordRes.status === 'SUCCESS') {
       onClose();
       return;
-    }
-    if (changePasswordRes.status === "ERROR") {
-      displayToast(toast, changePasswordRes.error ?? "", "error");
     }
   }, [changePasswordRes]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     console.log(data);
     await changePassword({
-      id: user?.id ?? "",
+      id: user?.id ?? '',
       oldPassword: data.oldPassword,
       newPassword: data.newPassword,
     });
@@ -61,24 +55,24 @@ export const ChangePasswordForm = ({ isOpen, onClose }: Props) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader textAlign="center">Change password</ModalHeader>
+        <ModalHeader textAlign='center'>Change password</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Input
-              type="password"
-              placeholder="Old password"
-              {...register("oldPassword", { required: true })}
-              margin="10px 0"
+              type='password'
+              placeholder='Old password'
+              {...register('oldPassword', { required: true })}
+              margin='10px 0'
             ></Input>
             <Input
-              type="password"
-              placeholder="New password"
-              {...register("newPassword", { required: true })}
+              type='password'
+              placeholder='New password'
+              {...register('newPassword', { required: true })}
             ></Input>
 
-            <Flex justifyContent="center">
-              <Button type="submit" margin="15px 0">
+            <Flex justifyContent='center'>
+              <Button type='submit' margin='15px 0'>
                 Change password
               </Button>
             </Flex>

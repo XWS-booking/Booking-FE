@@ -16,7 +16,6 @@ import {
 import { Accommodation } from '../../store/accommodation-store/types/accommodation.type';
 import { useApplicationStore } from '../../store/application.store';
 import { useToast } from '@chakra-ui/react';
-import { displayToast } from '../../utils/toast.caller';
 
 interface Props {
   isOpen: boolean;
@@ -94,11 +93,7 @@ export const BookAccommodationDialog = ({
   const BookAccommodation = useApplicationStore(
     (state) => state.bookAccommodation
   );
-  const bookAccommodationRes = useApplicationStore(
-    (state) => state.bookAccommodationRes
-  );
   const user = useApplicationStore((state) => state.user);
-  const toast = useToast();
   const book = async () => {
     await BookAccommodation({
       accommodationId: accommodation.id,
@@ -107,12 +102,6 @@ export const BookAccommodationDialog = ({
       guests: guests,
       buyerId: user?.id,
     });
-    if (bookAccommodationRes.status === 'SUCCESS') {
-      displayToast(toast, 'Reservation request has been sent!', 'success');
-    } else {
-      console.log(bookAccommodationRes.error);
-      displayToast(toast, bookAccommodationRes.error ?? '', 'error');
-    }
     closeModal();
   };
 
