@@ -36,6 +36,7 @@ export const EditAccommodationForm = ({ isOpen, onClose, id }: Props) => {
   );
   const editPricing = useApplicationStore((state) => state.editPricing);
   const editPricingRes = useApplicationStore((state) => state.editPricingRes);
+  const user = useApplicationStore((state) => state.user);
 
   const updatePricing = (index: number, field: string, val: any) => {
     const newValues = [...pricing];
@@ -86,7 +87,9 @@ export const EditAccommodationForm = ({ isOpen, onClose, id }: Props) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent minW={'1000px'}>
-        <ModalHeader textAlign='center'>Create accomodation</ModalHeader>
+        <ModalHeader textAlign='center'>
+          {user?.role == 1 ? 'Update accomodation' : 'Information'}
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Flex gap={10}>
@@ -177,9 +180,11 @@ export const EditAccommodationForm = ({ isOpen, onClose, id }: Props) => {
                 placeholder='Maximum guests'
               ></Input>
               <Flex justifyContent='center'>
-                <Button type='submit' margin='15px 0'>
-                  Edit accommodation
-                </Button>
+                {user?.role == 1 && (
+                  <Button type='submit' margin='15px 0'>
+                    Edit accommodation
+                  </Button>
+                )}
               </Flex>
             </form>
             <Flex direction={'column'} flex={1}>
@@ -204,10 +209,15 @@ export const EditAccommodationForm = ({ isOpen, onClose, id }: Props) => {
                       updatePricing(index, 'pricingType', val)
                     }
                     onDelete={() => deletePricing(index)}
+                    showDelete={user?.role == 1}
                   />
                 ))}
               </Flex>
-              <CreateAccommodationPricingButton onClick={() => addPricing()} />
+              {user?.role == 1 && (
+                <CreateAccommodationPricingButton
+                  onClick={() => addPricing()}
+                />
+              )}
             </Flex>
           </Flex>
         </ModalBody>

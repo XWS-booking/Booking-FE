@@ -20,6 +20,7 @@ export type ReservationStoreState = {
   confirmReservationRes: ResponseState<null>;
   rejectReservationRes: ResponseState<null>;
   cancelReservationRes: ResponseState<any>;
+  accommodationsReservationsRes: ResponseState<Reservation[]>;
 };
 export type ReservationActions = {
   bookAccommodation: (reservation: ReservationRequest) => Promise<void>;
@@ -32,6 +33,7 @@ export type ReservationActions = {
   confirmReservation: (id: string) => Promise<void>;
   rejectReservation: (id: string) => Promise<void>;
   cancelReservation: (id: string) => Promise<void>;
+  getAccommodationsReservations: (id: string) => Promise<void>;
 };
 
 export const state: ReservationStoreState = {
@@ -72,6 +74,11 @@ export const state: ReservationStoreState = {
   },
   cancelReservationRes: {
     data: null,
+    status: 'IDLE',
+    error: null,
+  },
+  accommodationsReservationsRes: {
+    data: [],
     status: 'IDLE',
     error: null,
   },
@@ -346,6 +353,39 @@ export const reservationStoreSlice: StateCreator<
       set(
         produce((state: ReservationStore) => {
           state.confirmReservationRes.status = 'ERROR';
+          return state;
+        })
+      );
+    }
+  },
+  getAccommodationsReservations: async (id: string) => {
+    set(
+      produce((state: ReservationStore) => {
+        state.accommodationsReservationsRes.status = 'LOADING';
+        return state;
+      })
+    );
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/api/reservations/accommodation/${id}`,
+        {
+          headers: {
+            Authorization: 'Bearer ' + get().loginStateRes.data,
+          },
+        }
+      );
+      set(
+        produce((state: ReservationStore) => {
+          state.accommodationsReservationsRes.status = 'SUCCESS';
+          state.accommodationsReservationsRes.data = res.data ?? [];
+          return state;
+        })
+      );
+    } catch (e) {
+      set(
+        produce((state: ReservationStore) => {
+          console.log('error');
+          state.accommodationsReservationsRes.status = 'ERROR';
           return state;
         })
       );
