@@ -138,7 +138,7 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (
       };
     } catch (e: any) {
       console.log(e);
-      toast.error(e.response.data.message);
+      toast.error(e.response.data);
       set(
         produce((state: AuthStoreState) => {
           state.deleteProfileRes.status = 'ERROR';
@@ -147,7 +147,7 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (
       );
       return {
         data: null,
-        error: e.response.data.message,
+        error: e.response.data,
       };
     }
   },
