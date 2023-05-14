@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -15,7 +15,8 @@ import {
 } from '@chakra-ui/react';
 import { Accommodation } from '../../store/accommodation-store/types/accommodation.type';
 import { useApplicationStore } from '../../store/application.store';
-import { useToast } from '@chakra-ui/react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 interface Props {
   isOpen: boolean;
@@ -37,10 +38,31 @@ export const BookAccommodationDialog = ({
   const [isDateValid, setIsDateValid] = useState(false);
   const [isGuestsValid, setIsGuestsValid] = useState(false);
 
-  const handleStartDateChange = (event: any) => {
-    const newStartDate = new Date(event.target.value);
-    const today = new Date();
-    if (newStartDate > endDate || newStartDate < today) {
+
+  const getAccommodationsReservations = useApplicationStore((state) => state.getAccommodationsReservations)
+  const accommodationsReservationsRes = useApplicationStore((state) => state.accommodationsReservationsRes)
+
+  useEffect(() => {
+    fetchAccommodationsReservations()
+  }, [])
+
+  const fetchAccommodationsReservations = async () => {
+    await getAccommodationsReservations(accommodation.id);
+  };
+
+  const filterDate = (date: Date) => {
+    if (accommodationsReservationsRes.status == "IDLE") filterDate(date)
+    for (const range of accommodationsReservationsRes.data) {
+      if (date >= new Date(range.startDate) && date <= new Date(range.endDate) && range.status == 1) {
+        return false;
+      }
+    }
+    return true; 
+  };
+
+
+  const handleStartDateChange = (newStartDate: Date) => {
+    if (newStartDate > endDate) {
       setIsDateValid(false);
     } else {
       setIsDateValid(true);
@@ -48,10 +70,8 @@ export const BookAccommodationDialog = ({
     setStartDate(newStartDate);
   };
 
-  const handleEndDateChange = (event: any) => {
-    const newEndDate = new Date(event.target.value);
-    const today = new Date();
-    if (startDate > newEndDate || startDate < today) {
+  const handleEndDateChange = (newEndDate: Date) => {
+    if (startDate > newEndDate) {
       setIsDateValid(false);
     } else {
       setIsDateValid(true);
@@ -126,11 +146,21 @@ export const BookAccommodationDialog = ({
           <Flex flexDirection='row'>
             <FormControl>
               <FormLabel mb='0'>Start Date</FormLabel>
-              <Input type='date' onChange={handleStartDateChange}></Input>
+               <DatePicker
+                inline
+                filterDate={filterDate}
+                onChange={handleStartDateChange}
+                minDate={new Date()}
+              />
             </FormControl>
             <FormControl>
               <FormLabel mb='0'>End Date</FormLabel>
-              <Input type='date' onChange={handleEndDateChange}></Input>
+              <DatePicker
+                inline
+                filterDate={filterDate}
+                onChange={handleEndDateChange}
+                minDate={new Date()}
+              />
             </FormControl>
           </Flex>
         </ModalBody>
