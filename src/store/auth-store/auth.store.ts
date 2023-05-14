@@ -6,8 +6,10 @@ import { User } from './model/user.model';
 import { Login } from './types/login.type';
 import { ResponseState } from '../response-state.type';
 import { Registration } from './types/registration.type';
-import { ChangePassword } from "./types/changePassword.type";
+import { ChangePassword } from './types/changePassword.type';
 
+import { toast } from 'react-toastify';
+import { ErrorResponse } from '../error-response.type';
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export type AuthStoreState = {
@@ -23,7 +25,7 @@ export type AuthActions = {
   login: (data: Login) => Promise<void>;
   logout: () => void;
   register: (register: Registration) => void;
-  deleteProfile: () => Promise<void>;
+  deleteProfile: () => Promise<ErrorResponse<null>>;
   fetchLoggedUser: (token: string) => Promise<void>;
   updatePersonalInfo: (user: User) => Promise<void>;
   changePassword: (info: ChangePassword) => Promise<void>;
@@ -33,7 +35,7 @@ export const state: AuthStoreState = {
   user: null,
   deleteProfileRes: {
     data: [],
-    status: "IDLE",
+    status: 'IDLE',
     error: null,
   },
   loginStateRes: {
@@ -48,12 +50,12 @@ export const state: AuthStoreState = {
   },
   updatePersonalInfoRes: {
     data: null,
-    status: "IDLE",
+    status: 'IDLE',
     error: null,
   },
   changePasswordRes: {
     data: [],
-    status: "IDLE",
+    status: 'IDLE',
     error: null,
   },
 };
@@ -84,9 +86,11 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (
           return state;
         })
       );
+      toast.success('Successfully logged in!');
       await get().fetchLoggedUser(resp.data.accessToken);
     } catch (e: any) {
       console.log(e);
+      toast.error(e.response.data.message);
       //Set error state
       set(
         produce((state: AuthStoreState) => {
@@ -127,14 +131,24 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (
           return state;
         })
       );
+      toast.success('Successfully deleted profile!');
+      return {
+        data: null,
+        error: null,
+      };
     } catch (e: any) {
+      console.log(e);
+      toast.error(e.response.data.message);
       set(
         produce((state: AuthStoreState) => {
           state.deleteProfileRes.status = 'ERROR';
-          state.deleteProfileRes.error = e.response.data;
           return state;
         })
       );
+      return {
+        data: null,
+        error: e.response.data.message,
+      };
     }
   },
   register: async (data: Registration) => {
@@ -143,16 +157,16 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (
         state.registrationStateRes.status = 'LOADING';
       })
     );
-
     try {
       await axios.post(`${BASE_URL}/api/auth/register`, data);
-
       set(
         produce((state: AuthStoreState) => {
           state.registrationStateRes.status = 'SUCCESS';
         })
       );
+      toast.success('Successfully registered');
     } catch (e: any) {
+      toast.error(e.response.data.message);
       set(
         produce((state: AuthStoreState) => {
           state.registrationStateRes.status = 'ERROR';
@@ -183,10 +197,9 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (
   },
 
   updatePersonalInfo: async (user: User) => {
-    console.log(user)
     set(
       produce((state: AuthStoreState) => {
-        state.updatePersonalInfoRes.status = "LOADING";
+        state.updatePersonalInfoRes.status = 'LOADING';
         return state;
       })
     );
@@ -202,15 +215,18 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (
       );
       set(
         produce((state: AuthStoreState) => {
-          state.updatePersonalInfoRes.status = "SUCCESS";
+          state.updatePersonalInfoRes.status = 'SUCCESS';
           state.updatePersonalInfoRes.data = res.data;
           return state;
         })
       );
+      toast.success('Successfully updated personal info!');
     } catch (e: any) {
+      console.log(e);
+      toast.error(e.response.data.message);
       set(
         produce((state: AuthStoreState) => {
-          state.updatePersonalInfoRes.status = "ERROR";
+          state.updatePersonalInfoRes.status = 'ERROR';
           state.updatePersonalInfoRes.error = e.response.data.message;
           return state;
         })
@@ -221,7 +237,7 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (
   changePassword: async (info: ChangePassword) => {
     set(
       produce((state: AuthStoreState) => {
-        state.changePasswordRes.status = "LOADING";
+        state.changePasswordRes.status = 'LOADING';
         return state;
       })
     );
@@ -237,15 +253,18 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (
       );
       set(
         produce((state: AuthStoreState) => {
-          state.changePasswordRes.status = "SUCCESS";
+          state.changePasswordRes.status = 'SUCCESS';
           state.changePasswordRes.data = res.data;
           return state;
         })
       );
+      toast.success('Password successfully changed!');
     } catch (e: any) {
+      console.log(e);
+      toast.error(e.response.data.message);
       set(
         produce((state: AuthStoreState) => {
-          state.changePasswordRes.status = "ERROR";
+          state.changePasswordRes.status = 'ERROR';
           state.changePasswordRes.error = e.response.data.message;
           return state;
         })

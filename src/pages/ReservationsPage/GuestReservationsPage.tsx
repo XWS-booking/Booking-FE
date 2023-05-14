@@ -14,7 +14,6 @@ import {
 } from '@chakra-ui/react';
 import { Reservation } from '../../store/reservation-store/types/reservation.type';
 import { format } from 'date-fns';
-import { displayToast } from '../../utils/toast.caller';
 
 export const GuestReservationsPage = () => {
   const getGuestsReservations = useApplicationStore(
@@ -32,29 +31,10 @@ export const GuestReservationsPage = () => {
   const cancelReservation = useApplicationStore(
     (state) => state.cancelReservation
   );
-  const cancelReservationRes = useApplicationStore(
-    (state) => state.cancelReservationRes
-  );
-  const toast = useToast();
-  const [canDisplay, setCanDisplay] = useState(false);
 
   useEffect(() => {
-    setCanDisplay(true);
     fetchReservations();
   }, [deleteReservationRes]);
-
-  useEffect(() => {
-    if (canDisplay) {
-      if (cancelReservationRes.status === 'SUCCESS') {
-        displayToast(toast, 'Reservation successfully canceled!', 'success');
-        return;
-      }
-      if (cancelReservationRes.status === 'ERROR') {
-        displayToast(toast, cancelReservationRes.error ?? '', 'error');
-      }
-      setCanDisplay(false);
-    }
-  }, [cancelReservationRes]);
 
   const fetchReservations = async () => {
     await getGuestsReservations();

@@ -9,7 +9,6 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { displayToast } from '../../utils/toast.caller';
 import { useNavigate } from 'react-router';
 import { DefaultValues, SubmitHandler, useForm } from 'react-hook-form';
 import { ChangePasswordForm } from '../../components/ChangePasswordForm/ChangePasswordForm';
@@ -30,7 +29,6 @@ type Inputs = {
 
 export const UserProfilePage = () => {
   const user = useApplicationStore((state) => state.user);
-  const [canDisplay, setCanDisplay] = useState(false);
   const deleteProfile = useApplicationStore((state) => state.deleteProfile);
   const deleteProfileRes = useApplicationStore(
     (state) => state.deleteProfileRes
@@ -39,20 +37,19 @@ export const UserProfilePage = () => {
   const updatePersonalInfo = useApplicationStore(
     (state) => state.updatePersonalInfo
   );
-  const updatePersonalInfoRes = useApplicationStore(
-    (state) => state.updatePersonalInfoRes
-  );
   const fetchLoggedUser = useApplicationStore((state) => state.fetchLoggedUser);
   const token = useApplicationStore((state) => state.loginStateRes.data);
-  const toast = useToast();
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [isUpdate, setIsUpdate] = useState<boolean>(false);
 
   const handleDeleteProfile = async () => {
-    setCanDisplay(true);
-    await deleteProfile();
+    const resp = await deleteProfile();
+    if (!resp.error) {
+      logout();
+      navigate('/');
+    }
   };
 
   const defaultValues: Inputs = {
@@ -79,36 +76,10 @@ export const UserProfilePage = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const { id, ...existingData } = data;
-    setCanDisplay(true);
     await updatePersonalInfo({ id: user?.id ?? '', ...existingData });
     await fetchLoggedUser(token ?? '');
   };
 
-  useEffect(() => {
-    if (canDisplay) {
-      if (deleteProfileRes.status === 'SUCCESS') {
-        displayToast(toast, 'Successfully deleted profile!', 'success');
-        logout();
-        navigate('/');
-        return;
-      }
-      if (deleteProfileRes.status === 'ERROR') {
-        displayToast(toast, deleteProfileRes.error ?? '', 'error');
-      }
-    }
-  }, [deleteProfileRes]);
-
-  useEffect(() => {
-    if (canDisplay) {
-      if (updatePersonalInfoRes.status === 'SUCCESS') {
-        displayToast(toast, 'Successfully updated personal info!', 'success');
-        return;
-      }
-      if (updatePersonalInfoRes.status === 'ERROR') {
-        displayToast(toast, updatePersonalInfoRes.error ?? '', 'error');
-      }
-    }
-  }, [updatePersonalInfoRes]);
   return (
     <Flex justifyContent='center'>
       <Flex width='30%' gap='15px' direction='column' padding='30px 0'>

@@ -8,6 +8,7 @@ import { AccomodationsFilter } from './types/accomodations-filter.type';
 import { ResponseState } from '../response-state.type';
 import { Accommodation } from './types/accommodation.type';
 import { Pricing } from './types/pricing.type';
+import { toast } from 'react-toastify';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
@@ -142,11 +143,14 @@ export const accommodationStoreSlice: StateCreator<
           return state;
         })
       );
-    } catch (e:any) {
+      toast.success('Successfully created accommodation');
+    } catch (e: any) {
+      toast.error(e.response.data.message);
+
       set(
         produce((state: AccommodationStoreState) => {
           state.createAccommodationRes.status = 'ERROR';
-          state.createAccommodationRes.error = e.response.data
+          state.createAccommodationRes.error = e.response.data;
           return state;
         })
       );
@@ -185,8 +189,10 @@ export const accommodationStoreSlice: StateCreator<
           return state;
         })
       );
+      toast.success('Successfully updated pricing');
     } catch (e: any) {
       console.log(e);
+      toast.error(e.response.data.message);
       set(
         produce((state: AccommodationStoreState) => {
           state.editPricingRes.status = 'ERROR';
