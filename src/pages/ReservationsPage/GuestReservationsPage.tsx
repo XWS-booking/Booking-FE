@@ -37,9 +37,10 @@ export const GuestReservationsPage = () => {
   const { isOpen, onOpen, onClose} = useDisclosure();
   const [reservation, setReservation] = useState<any>();
   const rateAccommodationRes = useApplicationStore((state) => state.rateAccommodationRes)
+  const updateAccommodationRatingRes = useApplicationStore((state) => state.updateAccommodationRatingRes)
   useEffect(() => {
     fetchReservations();
-  }, [deleteReservationRes, rateAccommodationRes]);
+  }, [deleteReservationRes, rateAccommodationRes, updateAccommodationRatingRes]);
 
   const fetchReservations = async () => {
     await getGuestsReservations();

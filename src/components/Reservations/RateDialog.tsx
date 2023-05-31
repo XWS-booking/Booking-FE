@@ -55,6 +55,7 @@ export const RateDialog = ({
   const rateAccommodation = useApplicationStore(
     (state) => state.rateAccommodation
   );
+  const updateAccommodationRating = useApplicationStore((state) => state.updateAccommodationRating)
   const user = useApplicationStore((state) => state.user)
   useEffect(() => {
     setDefaultValues({rating: reservation?.accommodationRating?.rating.toString() ?? ""})
@@ -62,6 +63,11 @@ export const RateDialog = ({
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     await rateAccommodation({accommodationId: reservation.accommodation.id, rating: parseInt(data.rating), guestId: user?.id, reservationId: reservation.id})
+    onClose()
+  };
+
+  const onUpdateSubmit: SubmitHandler<Inputs> = async (data) => {
+    await updateAccommodationRating({id: reservation.accommodationRating?.id, rating: parseInt(data.rating)})
     onClose()
   };
 
@@ -77,11 +83,11 @@ export const RateDialog = ({
         <ModalHeader>Rate accommodation</ModalHeader>
         <ModalCloseButton/>
           <Flex flexDirection={'row'} padding={'5'} justifyContent={'space-between'}>
-            <FormLabel>Rating</FormLabel>
-            <Input type={'number'} min={'1'} max={'5'} {...register('rating', { required: true })} defaultValue={defaultValues?.rating}></Input>
+            <FormLabel mt={'7px'}>Rating (min:1 max:5)</FormLabel>
+            <Input width={'100px'} type={'number'}  {...register('rating', { required: true, min:1, max:5 })} defaultValue={defaultValues?.rating}></Input>
             { reservation?.accommodationRating?.id == "" ?
-              <Button onClick={handleSubmit(onSubmit)}>Rate</Button> : <>
-                <Button>Update</Button>
+              <Button onClick={handleSubmit(onSubmit)}>Add Rating</Button> : <>
+                <Button onClick={handleSubmit(onUpdateSubmit)}>Update</Button>
                 <Button>Remove</Button>
               </>
             }

@@ -6,16 +6,19 @@ import { ResponseState } from '../response-state.type';
 import { toast } from 'react-toastify';
 import { AccommodationRating } from './types/accommodationRating';
 import { AccommodationRatingRequest } from './types/accommodationRatingRequest';
+import { UpdateAccommodationRatingRequest } from './types/updateAccommodationRatingRequest';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export type RatingsStoreState = {
   accommodationRatingsRes: ResponseState<AccommodationRating[]>;
   rateAccommodationRes: ResponseState<any>;
+  updateAccommodationRatingRes: ResponseState<any>
 };
 export type RatingsActions = {
   getAccommodationRatings: (id: string) => Promise<void>;
   rateAccommodation: (rating: AccommodationRatingRequest) => Promise<void>
+  updateAccommodationRating: (rating: UpdateAccommodationRatingRequest) => Promise<void>
 };
 
 export const state: RatingsStoreState = {
@@ -25,6 +28,11 @@ export const state: RatingsStoreState = {
     error: null,
   },
   rateAccommodationRes : {
+    data: null,
+    status: 'IDLE',
+    error: null
+  },
+  updateAccommodationRatingRes : {
     data: null,
     status: 'IDLE',
     error: null
@@ -99,6 +107,40 @@ export const ratingsStoreSlice: StateCreator<
           state.rateAccommodationRes.status = 'ERROR';
           state.rateAccommodationRes.data = null;
           state.rateAccommodationRes.error = e.response.data.message;
+          return state;
+        })
+      );
+      toast.error(e.response.data.message);
+    }
+  },
+  updateAccommodationRating: async (rating: UpdateAccommodationRatingRequest) => {
+    set(
+      produce((state: RatingsStore) => {
+        state.updateAccommodationRatingRes.status = 'LOADING';
+        return state;
+      })
+    );
+    try {
+        console.log(rating)
+      const res = await axios.patch(`${BASE_URL}/api/rating/accommodation`, rating, {
+        headers: {
+          Authorization: 'Bearer ' + get().loginStateRes.data,
+        },
+      });
+      set(
+        produce((state: RatingsStore) => {
+          state.updateAccommodationRatingRes.status = 'SUCCESS';
+          state.updateAccommodationRatingRes.data = res.data;
+          return state;
+        })
+      );
+      toast.success('Successfully updated accommodation rating!');
+    } catch (e: any) {
+      set(
+        produce((state: RatingsStore) => {
+          state.updateAccommodationRatingRes.status = 'ERROR';
+          state.updateAccommodationRatingRes.data = null;
+          state.updateAccommodationRatingRes.error = e.response.data.message;
           return state;
         })
       );
