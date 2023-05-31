@@ -10,10 +10,13 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
   useToast,
 } from '@chakra-ui/react';
 import { Reservation } from '../../store/reservation-store/types/reservation.type';
 import { format } from 'date-fns';
+import { RateDialog } from '../../components/Reservations/RateDialog';
+import { Accommodation } from '../../store/accommodation-store/types/accommodation.type';
 
 export const GuestReservationsPage = () => {
   const getGuestsReservations = useApplicationStore(
@@ -31,10 +34,12 @@ export const GuestReservationsPage = () => {
   const cancelReservation = useApplicationStore(
     (state) => state.cancelReservation
   );
-
+  const { isOpen, onOpen, onClose} = useDisclosure();
+  const [reservation, setReservation] = useState<any>();
+  const rateAccommodationRes = useApplicationStore((state) => state.rateAccommodationRes)
   useEffect(() => {
     fetchReservations();
-  }, [deleteReservationRes]);
+  }, [deleteReservationRes, rateAccommodationRes]);
 
   const fetchReservations = async () => {
     await getGuestsReservations();
@@ -47,6 +52,11 @@ export const GuestReservationsPage = () => {
     await cancelReservation(id);
     await getGuestsReservations();
   };
+
+  const openDialog = async (reservation: Reservation) => {
+    setReservation(reservation)
+    onOpen()
+  }
 
   return (
     <>
@@ -96,13 +106,23 @@ export const GuestReservationsPage = () => {
                       </Button>
                     </Td>
                   )}
-                  {item.status === 1 && (
+                  {(item.status === 1 && new Date(item.endDate) > new Date()) && (
                     <Td>
                       <Button
                         colorScheme='red'
                         onClick={() => handleCancelReservation(item.id)}
                       >
                         Cancel
+                      </Button>
+                    </Td>
+                  )}
+                   {(item.status === 1 && new Date(item.endDate) < new Date()) && (
+                    <Td>
+                      <Button
+                        colorScheme='orange'
+                        onClick={() => openDialog(item)}
+                      >
+                        Rate
                       </Button>
                     </Td>
                   )}
@@ -113,6 +133,11 @@ export const GuestReservationsPage = () => {
           </Tbody>
         </Table>
       </TableContainer>
+      <RateDialog
+        isOpen={isOpen}
+        onClose={onClose}
+        reservation={reservation}
+      ></RateDialog>
     </>
   );
 };
