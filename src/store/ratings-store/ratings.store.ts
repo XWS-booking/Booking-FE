@@ -14,11 +14,13 @@ export type RatingsStoreState = {
   accommodationRatingsRes: ResponseState<AccommodationRating[]>;
   rateAccommodationRes: ResponseState<any>;
   updateAccommodationRatingRes: ResponseState<any>
+  deleteAccommodationRatingRes: ResponseState<any>
 };
 export type RatingsActions = {
   getAccommodationRatings: (id: string) => Promise<void>;
   rateAccommodation: (rating: AccommodationRatingRequest) => Promise<void>
   updateAccommodationRating: (rating: UpdateAccommodationRatingRequest) => Promise<void>
+  deleteAccommodationRating: (ratingId: string, reservationId: string) => Promise<void>
 };
 
 export const state: RatingsStoreState = {
@@ -35,6 +37,11 @@ export const state: RatingsStoreState = {
   updateAccommodationRatingRes : {
     data: null,
     status: 'IDLE',
+    error: null
+  },
+  deleteAccommodationRatingRes: {
+    data: null,
+    status: "IDLE",
     error: null
   }
 };
@@ -87,7 +94,6 @@ export const ratingsStoreSlice: StateCreator<
       })
     );
     try {
-        console.log(rating)
       const res = await axios.post(`${BASE_URL}/api/rating/accommodation`, rating, {
         headers: {
           Authorization: 'Bearer ' + get().loginStateRes.data,
@@ -121,7 +127,6 @@ export const ratingsStoreSlice: StateCreator<
       })
     );
     try {
-        console.log(rating)
       const res = await axios.patch(`${BASE_URL}/api/rating/accommodation`, rating, {
         headers: {
           Authorization: 'Bearer ' + get().loginStateRes.data,
@@ -147,5 +152,37 @@ export const ratingsStoreSlice: StateCreator<
       toast.error(e.response.data.message);
     }
   },
- 
+  deleteAccommodationRating: async (ratingId: string, reservationId: string) => {
+    set(
+      produce((state: RatingsStore) => {
+        state.deleteAccommodationRatingRes.status = 'LOADING';
+        return state;
+      })
+    );
+    try {
+      const res = await axios.delete(`${BASE_URL}/api/rating/accommodation/${ratingId}/${reservationId}`, {
+        headers: {
+          Authorization: 'Bearer ' + get().loginStateRes.data,
+        },
+      });
+      set(
+        produce((state: RatingsStore) => {
+          state.deleteAccommodationRatingRes.status = 'SUCCESS';
+          state.deleteAccommodationRatingRes.data = res.data;
+          return state;
+        })
+      );
+      toast.success('Successfully deleted accommodation rating!');
+    } catch (e: any) {
+      set(
+        produce((state: RatingsStore) => {
+          state.deleteAccommodationRatingRes.status = 'ERROR';
+          state.deleteAccommodationRatingRes.data = null;
+          state.deleteAccommodationRatingRes.error = e.response.data.message;
+          return state;
+        })
+      );
+      toast.error(e.response.data.message);
+    }
+  },
 });

@@ -38,9 +38,10 @@ export const GuestReservationsPage = () => {
   const [reservation, setReservation] = useState<any>();
   const rateAccommodationRes = useApplicationStore((state) => state.rateAccommodationRes)
   const updateAccommodationRatingRes = useApplicationStore((state) => state.updateAccommodationRatingRes)
+  const deleteAccommodationRatingRes = useApplicationStore((state) => state.deleteAccommodationRatingRes)
   useEffect(() => {
     fetchReservations();
-  }, [deleteReservationRes, rateAccommodationRes, updateAccommodationRatingRes]);
+  }, [deleteReservationRes, rateAccommodationRes, updateAccommodationRatingRes, deleteAccommodationRatingRes]);
 
   const fetchReservations = async () => {
     await getGuestsReservations();

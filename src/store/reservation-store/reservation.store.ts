@@ -220,7 +220,6 @@ export const reservationStoreSlice: StateCreator<
         produce((state: ReservationStore) => {
           state.guestsReservationsRes.status = 'SUCCESS';
           state.guestsReservationsRes.data = res.data;
-          console.log(res.data)
           return state;
         })
       );

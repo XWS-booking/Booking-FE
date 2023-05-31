@@ -5,27 +5,14 @@ import {
   ModalContent,
   ModalHeader,
   ModalCloseButton,
-  ModalBody,
-  ModalFooter,
   Button,
   Input,
   Flex,
-  FormControl,
   FormLabel,
-  Text,
-  Box,
-  Badge,
-  Spinner,
 } from '@chakra-ui/react';
-import { Accommodation } from '../../store/accommodation-store/types/accommodation.type';
 import { useApplicationStore } from '../../store/application.store';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { AccommodationRating } from '../../store/ratings-store/types/accommodationRating';
-import {format} from 'date-fns'
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Reservation } from '../../store/reservation-store/types/reservation.type';
-import { render } from '@testing-library/react';
 
 interface Props {
   isOpen: boolean;
@@ -56,6 +43,7 @@ export const RateDialog = ({
     (state) => state.rateAccommodation
   );
   const updateAccommodationRating = useApplicationStore((state) => state.updateAccommodationRating)
+  const deleteAccommodationRating = useApplicationStore((state) => state.deleteAccommodationRating)
   const user = useApplicationStore((state) => state.user)
   useEffect(() => {
     setDefaultValues({rating: reservation?.accommodationRating?.rating.toString() ?? ""})
@@ -68,6 +56,12 @@ export const RateDialog = ({
 
   const onUpdateSubmit: SubmitHandler<Inputs> = async (data) => {
     await updateAccommodationRating({id: reservation.accommodationRating?.id, rating: parseInt(data.rating)})
+    onClose()
+  };
+
+  const onDeleteSubmit: SubmitHandler<Inputs> = async (data) => {
+    await deleteAccommodationRating(reservation.accommodationRating?.id ?? "", reservation.id)
+    reset({rating: ""})
     onClose()
   };
 
@@ -88,7 +82,7 @@ export const RateDialog = ({
             { reservation?.accommodationRating?.id == "" ?
               <Button onClick={handleSubmit(onSubmit)}>Add Rating</Button> : <>
                 <Button onClick={handleSubmit(onUpdateSubmit)}>Update</Button>
-                <Button>Remove</Button>
+                <Button onClick={handleSubmit(onDeleteSubmit)}>Remove</Button>
               </>
             }
           </Flex>
