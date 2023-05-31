@@ -1,4 +1,5 @@
 import { Accommodation } from "../../accommodation-store/types/accommodation.type"
+import { AccommodationRating } from "../../ratings-store/types/accommodationRating"
 
 export type Reservation = {
     id: string
@@ -8,4 +9,5 @@ export type Reservation = {
     endDate: Date
     guests: number
     status?: number
+    accommodationRating?: AccommodationRating
 }

@@ -49,7 +49,7 @@ export const BookAccommodationDialog = ({
   const getBookingPrice = useApplicationStore((state) => state.getBookingPrice);
 
   useEffect(() => {
-    fetchAccommodationsReservations();
+      fetchAccommodationsReservations();
   }, []);
 
   const fetchAccommodationsReservations = async () => {

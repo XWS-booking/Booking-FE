@@ -18,4 +18,5 @@ export type Accommodation = {
   pictureUrls: string[];
   owner: User;
   pricing: Pricing[];
+  averageRating: number
 };

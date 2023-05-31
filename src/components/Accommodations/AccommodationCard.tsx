@@ -14,6 +14,7 @@ import Slider from 'react-slick';
 import { BookAccommodationDialog } from './BookAccommodationDialog';
 import { useApplicationStore } from '../../store/application.store';
 import { EditAccommodationForm } from '../EditAccommodationForm/EditAccommodationForm';
+import { AccommodationRatingsDialog } from './AccommodationRatingsDialog';
 
 interface Props {
   accommodation: Accommodation;
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export const AccommodationCard = ({ accommodation, onEditSelected }: Props) => {
+  const { isOpen : isRatingsOpen, onOpen : onRatingsOpen, onClose : onRatingsClose } = useDisclosure();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -50,14 +52,6 @@ export const AccommodationCard = ({ accommodation, onEditSelected }: Props) => {
         mb='3'
         position={'relative'}
       >
-        <Button
-          position={'absolute'}
-          top={'5px'}
-          right={'5px'}
-          onClick={handleEdit}
-        >
-          {user?.role == 1 ? 'Edit' : 'Information'}
-        </Button>
         <Box padding='20px' width='40%'>
           <Slider {...settings}>
             {accommodation.pictureUrls?.map((image) => (
@@ -76,7 +70,7 @@ export const AccommodationCard = ({ accommodation, onEditSelected }: Props) => {
           </Slider>
         </Box>
         <Box p='6' w='60%'>
-          <Box display='flex' alignItems='baseline'>
+          <Flex justifyContent={'space-between'}>
             <Box
               color='gray.500'
               fontWeight='semibold'
@@ -106,7 +100,12 @@ export const AccommodationCard = ({ accommodation, onEditSelected }: Props) => {
                 </Badge>
               )}
             </Box>
-          </Box>
+            <Box>
+              <Button colorScheme={'orange'} onClick={onRatingsOpen}>
+                {accommodation.averageRating}
+              </Button>
+            </Box>
+          </Flex>
 
           <Box mt='1' fontWeight='semibold' lineHeight='tight'>
             {accommodation.name}
@@ -126,18 +125,26 @@ export const AccommodationCard = ({ accommodation, onEditSelected }: Props) => {
               Max guests: {accommodation.maxGuests}
             </Text>
           </Box>
-          {user?.role == 0 && (
-            <Box mt='2'>
+          <Flex mt={'2'} flexDirection={'row'}>
+            {user?.role == 0 && (
               <Button colorScheme='blue' onClick={handleOpenModal}>
                 Book
               </Button>
-            </Box>
-          )}
+            )}
+            <Button colorScheme='blue' onClick={handleEdit} ml={'2'}>
+              {user?.role == 1 ? 'Edit' : 'Information'}
+            </Button>
+          </Flex>
         </Box>
       </Card>
       <BookAccommodationDialog
         isOpen={isModalOpen}
         onClose={handleCloseModal}
+        accommodation={accommodation}
+      />
+       <AccommodationRatingsDialog
+        isOpen={isRatingsOpen}
+        onClose={onRatingsClose}
         accommodation={accommodation}
       />
     </>
