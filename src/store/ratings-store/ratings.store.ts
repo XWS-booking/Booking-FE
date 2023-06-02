@@ -7,20 +7,34 @@ import { toast } from 'react-toastify';
 import { AccommodationRating } from './types/accommodationRating';
 import { AccommodationRatingRequest } from './types/accommodationRatingRequest';
 import { UpdateAccommodationRatingRequest } from './types/updateAccommodationRatingRequest';
+import { HostRatings } from './types/hostRatings';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export type RatingsStoreState = {
   accommodationRatingsRes: ResponseState<AccommodationRating[]>;
   rateAccommodationRes: ResponseState<any>;
-  updateAccommodationRatingRes: ResponseState<any>
-  deleteAccommodationRatingRes: ResponseState<any>
+  updateAccommodationRatingRes: ResponseState<any>;
+  deleteAccommodationRatingRes: ResponseState<any>;
+  hostRatings: ResponseState<HostRatings | null>;
+  deleteHostRatingRes: ResponseState<any>;
+  updateHostRatingRes: ResponseState<any>;
+  createHostRatingRes: ResponseState<any>;
 };
 export type RatingsActions = {
   getAccommodationRatings: (id: string) => Promise<void>;
-  rateAccommodation: (rating: AccommodationRatingRequest) => Promise<void>
-  updateAccommodationRating: (rating: UpdateAccommodationRatingRequest) => Promise<void>
-  deleteAccommodationRating: (ratingId: string, reservationId: string) => Promise<void>
+  rateAccommodation: (rating: AccommodationRatingRequest) => Promise<void>;
+  updateAccommodationRating: (
+    rating: UpdateAccommodationRatingRequest
+  ) => Promise<void>;
+  deleteAccommodationRating: (
+    ratingId: string,
+    reservationId: string
+  ) => Promise<void>;
+  getHostRatings: (hostId: string) => Promise<void>;
+  deleteHostRating: (id: string) => Promise<void>;
+  updateHostRating: (id: string, rate: string) => Promise<void>;
+  createHostRating: (hostId: string, rate: string) => Promise<void>;
 };
 
 export const state: RatingsStoreState = {
@@ -29,31 +43,49 @@ export const state: RatingsStoreState = {
     status: 'IDLE',
     error: null,
   },
-  rateAccommodationRes : {
+  rateAccommodationRes: {
     data: null,
     status: 'IDLE',
-    error: null
+    error: null,
   },
-  updateAccommodationRatingRes : {
+  updateAccommodationRatingRes: {
     data: null,
     status: 'IDLE',
-    error: null
+    error: null,
   },
   deleteAccommodationRatingRes: {
     data: null,
-    status: "IDLE",
-    error: null
-  }
+    status: 'IDLE',
+    error: null,
+  },
+  hostRatings: {
+    data: null,
+    status: 'IDLE',
+    error: null,
+  },
+  deleteHostRatingRes: {
+    data: null,
+    status: 'IDLE',
+    error: null,
+  },
+  updateHostRatingRes: {
+    data: null,
+    status: 'IDLE',
+    error: null,
+  },
+  createHostRatingRes: {
+    data: null,
+    status: 'IDLE',
+    error: null,
+  },
 };
 
 export type RatingsStore = RatingsStoreState & RatingsActions;
 
-export const ratingsStoreSlice: StateCreator<
-  AppStore,
-  [],
-  [],
-  RatingsStore
-> = (set, get) => ({
+export const ratingsStoreSlice: StateCreator<AppStore, [], [], RatingsStore> = (
+  set,
+  get
+) => ({
   ...state,
   getAccommodationRatings: async (id: string) => {
     set(
@@ -63,11 +95,14 @@ export const ratingsStoreSlice: StateCreator<
       })
     );
     try {
-      const res = await axios.get(`${BASE_URL}/api/rating/accommodation/${id}`, {
-        headers: {
-          Authorization: 'Bearer ' + get().loginStateRes.data,
-        },
-      });
+      const res = await axios.get(
+        `${BASE_URL}/api/rating/accommodation/${id}`,
+        {
+          headers: {
+            Authorization: 'Bearer ' + get().loginStateRes.data,
+          },
+        }
+      );
       set(
         produce((state: RatingsStore) => {
           state.accommodationRatingsRes.status = 'SUCCESS';
@@ -94,11 +129,15 @@ export const ratingsStoreSlice: StateCreator<
       })
     );
     try {
-      const res = await axios.post(`${BASE_URL}/api/rating/accommodation`, rating, {
-        headers: {
-          Authorization: 'Bearer ' + get().loginStateRes.data,
-        },
-      });
+      const res = await axios.post(
+        `${BASE_URL}/api/rating/accommodation`,
+        rating,
+        {
+          headers: {
+            Authorization: 'Bearer ' + get().loginStateRes.data,
+          },
+        }
+      );
       set(
         produce((state: RatingsStore) => {
           state.rateAccommodationRes.status = 'SUCCESS';
@@ -119,7 +158,9 @@ export const ratingsStoreSlice: StateCreator<
       toast.error(e.response.data.message);
     }
   },
-  updateAccommodationRating: async (rating: UpdateAccommodationRatingRequest) => {
+  updateAccommodationRating: async (
+    rating: UpdateAccommodationRatingRequest
+  ) => {
     set(
       produce((state: RatingsStore) => {
         state.updateAccommodationRatingRes.status = 'LOADING';
@@ -127,11 +168,15 @@ export const ratingsStoreSlice: StateCreator<
       })
     );
     try {
-      const res = await axios.patch(`${BASE_URL}/api/rating/accommodation`, rating, {
-        headers: {
-          Authorization: 'Bearer ' + get().loginStateRes.data,
-        },
-      });
+      const res = await axios.patch(
+        `${BASE_URL}/api/rating/accommodation`,
+        rating,
+        {
+          headers: {
+            Authorization: 'Bearer ' + get().loginStateRes.data,
+          },
+        }
+      );
       set(
         produce((state: RatingsStore) => {
           state.updateAccommodationRatingRes.status = 'SUCCESS';
@@ -152,7 +197,10 @@ export const ratingsStoreSlice: StateCreator<
       toast.error(e.response.data.message);
     }
   },
-  deleteAccommodationRating: async (ratingId: string, reservationId: string) => {
+  deleteAccommodationRating: async (
+    ratingId: string,
+    reservationId: string
+  ) => {
     set(
       produce((state: RatingsStore) => {
         state.deleteAccommodationRatingRes.status = 'LOADING';
@@ -160,11 +208,14 @@ export const ratingsStoreSlice: StateCreator<
       })
     );
     try {
-      const res = await axios.delete(`${BASE_URL}/api/rating/accommodation/${ratingId}/${reservationId}`, {
-        headers: {
-          Authorization: 'Bearer ' + get().loginStateRes.data,
-        },
-      });
+      const res = await axios.delete(
+        `${BASE_URL}/api/rating/accommodation/${ratingId}/${reservationId}`,
+        {
+          headers: {
+            Authorization: 'Bearer ' + get().loginStateRes.data,
+          },
+        }
+      );
       set(
         produce((state: RatingsStore) => {
           state.deleteAccommodationRatingRes.status = 'SUCCESS';
@@ -179,6 +230,151 @@ export const ratingsStoreSlice: StateCreator<
           state.deleteAccommodationRatingRes.status = 'ERROR';
           state.deleteAccommodationRatingRes.data = null;
           state.deleteAccommodationRatingRes.error = e.response.data.message;
+          return state;
+        })
+      );
+      toast.error(e.response.data.message);
+    }
+  },
+  getHostRatings: async (hostId: string) => {
+    set(
+      produce((state: RatingsStore) => {
+        state.hostRatings.status = 'LOADING';
+        return state;
+      })
+    );
+    try {
+      const res = await axios.get(`${BASE_URL}/api/rating/${hostId}/host`, {
+        headers: {
+          Authorization: 'Bearer ' + get().loginStateRes.data,
+        },
+      });
+      set(
+        produce((state: RatingsStore) => {
+          state.hostRatings.status = 'SUCCESS';
+          state.hostRatings.data = res.data;
+          return state;
+        })
+      );
+    } catch (e: any) {
+      set(
+        produce((state: RatingsStore) => {
+          state.hostRatings.status = 'ERROR';
+          state.hostRatings.data = null;
+          state.hostRatings.error = e.response.data.message;
+          return state;
+        })
+      );
+    }
+  },
+  deleteHostRating: async (id: string) => {
+    set(
+      produce((state: RatingsStore) => {
+        state.deleteHostRatingRes.status = 'LOADING';
+        return state;
+      })
+    );
+    try {
+      const res = await axios.delete(`${BASE_URL}/api/rating/${id}/host`, {
+        headers: {
+          Authorization: 'Bearer ' + get().loginStateRes.data,
+        },
+      });
+      set(
+        produce((state: RatingsStore) => {
+          state.deleteHostRatingRes.status = 'SUCCESS';
+          state.deleteHostRatingRes.data = res.data;
+          return state;
+        })
+      );
+      toast.success('Successfully deleted host rating!');
+    } catch (e: any) {
+      set(
+        produce((state: RatingsStore) => {
+          state.deleteHostRatingRes.status = 'ERROR';
+          state.deleteHostRatingRes.data = null;
+          state.deleteHostRatingRes.error = e.response.data.message;
+          return state;
+        })
+      );
+      toast.error(e.response.data.message);
+    }
+  },
+  updateHostRating: async (id: string, rate: string) => {
+    set(
+      produce((state: RatingsStore) => {
+        state.updateHostRatingRes.status = 'LOADING';
+        return state;
+      })
+    );
+    try {
+      const res = await axios.patch(
+        `${BASE_URL}/api/rating/host`,
+        {
+          id: id,
+          rating: rate,
+        },
+        {
+          headers: {
+            Authorization: 'Bearer ' + get().loginStateRes.data,
+          },
+        }
+      );
+      set(
+        produce((state: RatingsStore) => {
+          state.updateHostRatingRes.status = 'SUCCESS';
+          state.updateHostRatingRes.data = res.data;
+          return state;
+        })
+      );
+      toast.success('Successfully updated host rating!');
+    } catch (e: any) {
+      set(
+        produce((state: RatingsStore) => {
+          state.updateHostRatingRes.status = 'ERROR';
+          state.updateHostRatingRes.data = null;
+          state.updateHostRatingRes.error = e.response.data.message;
+          return state;
+        })
+      );
+      toast.error(e.response.data.message);
+    }
+  },
+  createHostRating: async (hostId: string, rate: string) => {
+    set(
+      produce((state: RatingsStore) => {
+        state.createHostRatingRes.status = 'LOADING';
+        return state;
+      })
+    );
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/api/rating/host`,
+        {
+          hostId: hostId,
+          guestId: get().user?.id,
+          rating: rate,
+        },
+        {
+          headers: {
+            Authorization: 'Bearer ' + get().loginStateRes.data,
+          },
+        }
+      );
+      set(
+        produce((state: RatingsStore) => {
+          state.createHostRatingRes.status = 'SUCCESS';
+          state.createHostRatingRes.data = res.data;
+          return state;
+        })
+      );
+      toast.success('Successfully added host rating!');
+    } catch (e: any) {
+      set(
+        produce((state: RatingsStore) => {
+          state.createHostRatingRes.status = 'ERROR';
+          state.createHostRatingRes.data = null;
+          state.createHostRatingRes.error = e.response.data.message;
           return state;
         })
       );

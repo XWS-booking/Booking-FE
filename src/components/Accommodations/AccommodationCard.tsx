@@ -15,6 +15,7 @@ import { BookAccommodationDialog } from './BookAccommodationDialog';
 import { useApplicationStore } from '../../store/application.store';
 import { EditAccommodationForm } from '../EditAccommodationForm/EditAccommodationForm';
 import { AccommodationRatingsDialog } from './AccommodationRatingsDialog';
+import { Link } from 'react-router-dom';
 
 interface Props {
   accommodation: Accommodation;
@@ -22,7 +23,11 @@ interface Props {
 }
 
 export const AccommodationCard = ({ accommodation, onEditSelected }: Props) => {
-  const { isOpen : isRatingsOpen, onOpen : onRatingsOpen, onClose : onRatingsClose } = useDisclosure();
+  const {
+    isOpen: isRatingsOpen,
+    onOpen: onRatingsOpen,
+    onClose: onRatingsClose,
+  } = useDisclosure();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -116,10 +121,16 @@ export const AccommodationCard = ({ accommodation, onEditSelected }: Props) => {
               {accommodation.zipCode} {accommodation.city},{' '}
               {accommodation.country}
             </Text>
-            <Text mt='2'>
-              Owner: {accommodation.owner.name} {accommodation.owner.surname},{' '}
-              {accommodation.owner.email}
-            </Text>
+            <Link
+              to={`/host/${accommodation.owner.id}`}
+              state={{ data: accommodation.owner }}
+            >
+              <Text mt='2'>
+                Owner: {accommodation.owner.name} {accommodation.owner.surname},{' '}
+                {accommodation.owner.email}
+              </Text>
+            </Link>
+
             <Text mt='2'>
               Min guests: {accommodation.minGuests} <br />
               Max guests: {accommodation.maxGuests}
@@ -142,7 +153,7 @@ export const AccommodationCard = ({ accommodation, onEditSelected }: Props) => {
         onClose={handleCloseModal}
         accommodation={accommodation}
       />
-       <AccommodationRatingsDialog
+      <AccommodationRatingsDialog
         isOpen={isRatingsOpen}
         onClose={onRatingsClose}
         accommodation={accommodation}
