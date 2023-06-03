@@ -18,6 +18,10 @@ export const REGISTRATION_VALIDATION_SCHEMA = yup.object({
   username: yup.string().required(),
 });
 
+export const HOST_RATE_VALIDATION_SCHEMA = yup.object({
+  rate: yup.number().required().min(1).max(5),
+});
+
 export const LOGIN_DEFAULT_VALUES = {
   email: '',
   password: '',
