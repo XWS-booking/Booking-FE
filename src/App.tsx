@@ -7,31 +7,42 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect } from 'react';
 import { useApplicationStore } from './store/application.store';
+import io from 'socket.io-client';
 
 function App() {
 
-  const user = useApplicationStore((state) => state.user)
+  const loginStateRes = useApplicationStore((state) => state.loginStateRes)
+
+  const connectToServer = () => {
+    const token = loginStateRes.data
+    const socket = io('http://localhost:8080', {
+    transportOptions: {
+      polling: {
+        extraHeaders: {
+          Authorization: token,
+        },
+      },
+    }
+    },);
+    console.log("connected to server")
+    socket.on('notification', (notification) => {
+      toast.info(notification.message, { autoClose: false })
+    });
+  
+    return socket;
+  }
+
 
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:8080/ws'); 
-
-    socket.addEventListener('open', () => {
-      console.log('WebSocket connection established.');
-    });
-
-    socket.addEventListener('message', (event) => {
-      const notification = JSON.parse(event.data);
-      console.log('Received notification:', notification);
-
-      if (user?.id == notification.recipient) 
-        toast.info(notification.message);
-    });
-
-    return () => {
-      socket.close();
-      console.log("closed socket")
-    };
-  }, []);
+    console.log(loginStateRes.data)
+    if (loginStateRes.data) {
+      const socket = connectToServer();
+      return () => {
+        console.log("Disconnected from the server")
+        socket.disconnect();
+      };
+    }
+  }, [loginStateRes]);
 
 
   return (
