@@ -95,6 +95,11 @@ export const Header = () => {
             Reservations
           </Button>
         )}
+        { user != null &&
+          <Button onClick={() => navigate('/notifications')} mr='5px'>
+            Notifications
+          </Button>
+        }
       </Box>
       <CreateAccomodationForm isOpen={isOpen} onClose={onClose} />
       <LoginForm

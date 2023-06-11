@@ -5,6 +5,7 @@ import { UserProfilePage } from '../pages/UserProfilePage/UserProfilePage';
 import { GuestReservationsPage } from '../pages/ReservationsPage/GuestReservationsPage';
 import { OwnerReservationsPage } from '../pages/ReservationsPage/OwnerReservationsPage';
 import { HostPage } from '../pages/HostPage/HostPage';
+import { NotificationPage } from '../pages/NotificationsPage/NotificationsPage';
 
 export const routes: RouteObject[] = [
   {
@@ -30,6 +31,10 @@ export const routes: RouteObject[] = [
       {
         path: '/host/:id',
         element: <HostPage />,
+      },
+      {
+        path: '/notifications',
+        element: <NotificationPage/>,
       },
     ],
   },
