@@ -56,7 +56,7 @@ export const RateForm = ({
 
   const handleOnSubmit = async (values: FormValues) => {
     if (flag === 'UPDATE') {
-      await updateHostRating(hostRate?.Id ?? '', values.rate);
+      await updateHostRating(hostRate?.Id ?? '', values.rate, hostRate?.HostId ?? "", hostRate?.Rating ?? 0);
       return;
     }
     await createHostRating(host, values.rate);

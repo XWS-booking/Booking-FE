@@ -55,7 +55,7 @@ export const RateDialog = ({
   };
 
   const onUpdateSubmit: SubmitHandler<Inputs> = async (data) => {
-    await updateAccommodationRating({id: reservation.accommodationRating?.id, rating: parseInt(data.rating)})
+    await updateAccommodationRating({id: reservation.accommodationRating?.id, rating: parseInt(data.rating), accommodationId: reservation.accommodation.id, oldRating: reservation.accommodationRating?.rating})
     onClose()
   };
 

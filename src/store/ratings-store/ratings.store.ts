@@ -33,7 +33,7 @@ export type RatingsActions = {
   ) => Promise<void>;
   getHostRatings: (hostId: string) => Promise<void>;
   deleteHostRating: (id: string) => Promise<void>;
-  updateHostRating: (id: string, rate: string) => Promise<void>;
+  updateHostRating: (id: string, rate: string, hostId: string, oldRating: number) => Promise<void>;
   createHostRating: (hostId: string, rate: string) => Promise<void>;
 };
 
@@ -300,7 +300,7 @@ export const ratingsStoreSlice: StateCreator<AppStore, [], [], RatingsStore> = (
       toast.error(e.response.data.message);
     }
   },
-  updateHostRating: async (id: string, rate: string) => {
+  updateHostRating: async (id: string, rate: string, hostId: string, oldRating: number) => {
     set(
       produce((state: RatingsStore) => {
         state.updateHostRatingRes.status = 'LOADING';
@@ -313,6 +313,8 @@ export const ratingsStoreSlice: StateCreator<AppStore, [], [], RatingsStore> = (
         {
           id: id,
           rating: rate,
+          hostId: hostId,
+          oldRating: oldRating
         },
         {
           headers: {
