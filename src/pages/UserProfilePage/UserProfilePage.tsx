@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useApplicationStore } from '../../store/application.store';
 import {
-  Box,
   Button,
   Flex,
   Input,
   Spinner,
   useDisclosure,
-  useToast,
+  Text,
+  Image,
+  Center,
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router';
-import { DefaultValues, SubmitHandler, useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { ChangePasswordForm } from '../../components/ChangePasswordForm/ChangePasswordForm';
+import { Role } from '../../store/auth-store/model/enums/role.enum';
 
 type Inputs = {
   id: string;
@@ -74,15 +76,31 @@ export const UserProfilePage = () => {
     defaultValues: defaultValues,
   });
 
+  useEffect(() => {
+    fetchLoggedUser(token ?? '');
+  }, []);
+
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const { id, ...existingData } = data;
-    await updatePersonalInfo({ id: user?.id ?? '', ...existingData });
+    await updatePersonalInfo({
+      id: user?.id ?? '',
+      distinguished: user?.distinguished ?? false,
+      ...existingData,
+    });
     await fetchLoggedUser(token ?? '');
   };
 
   return (
     <Flex justifyContent='center'>
       <Flex width='30%' gap='15px' direction='column' padding='30px 0'>
+        {user?.role == Role.HOST && user?.distinguished && (
+          <Center>
+            <Flex>
+              <Text mb={0}>You are distinguished host!</Text>
+              <Image src='distinguished.png' width={8} height={8} />
+            </Flex>
+          </Center>
+        )}
         <Input
           defaultValue={defaultValues?.username}
           disabled={!isUpdate}
