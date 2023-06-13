@@ -1,13 +1,18 @@
-import { useEffect, useState } from 'react';
-import { useApplicationStore } from '../../store/application.store';
 import { Flex, Spinner, useDisclosure } from '@chakra-ui/react';
-import { Accommodation } from '../../store/accommodation-store/types/accommodation.type';
-import { AccommodationCard } from '../../components/Accommodations/AccommodationCard';
-import '../../styles/pagination.css';
+import { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import { AccommodationCard } from '../../components/Accommodations/AccommodationCard';
+import { AccommodationFiltering } from '../../components/Accommodations/AccommodationFilters';
 import { SearchAccommodation } from '../../components/Accommodations/SearchAccommodation';
-import { AccomodationsFilter } from '../../store/accommodation-store/types/accomodations-filter.type';
 import { EditAccommodationForm } from '../../components/EditAccommodationForm/EditAccommodationForm';
+import {
+  AccommodationFilters,
+  AccommodationFiltersAdditions,
+} from '../../store/accommodation-store/types/accommodation.filters.type';
+import { Accommodation } from '../../store/accommodation-store/types/accommodation.type';
+import { AccommodationSearchFilters } from '../../store/accommodation-store/types/accomodation-search-filters.type';
+import { useApplicationStore } from '../../store/application.store';
+import '../../styles/pagination.css';
 
 export const AccommodationPage = () => {
   const getAccommodations = useApplicationStore(
@@ -16,28 +21,26 @@ export const AccommodationPage = () => {
   const accommodationPageRes = useApplicationStore(
     (state) => state.accommodationPageRes
   );
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [city, setCity] = useState<string>('');
-  const [guests, setGuests] = useState<number>(-1);
-  const [startDate, setStartDate] = useState<Date>(
-    new Date('0001-01-01T00:00:00Z')
-  );
-  const [endDate, setEndDate] = useState<Date>(
-    new Date('0001-01-01T00:00:00Z')
-  );
   const [selectedId, setSelectedId] = useState<string>('');
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  useEffect(() => {
-    const filters: AccomodationsFilter = {
-      city,
-      guests,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
+  const [searchFilters, setSearchFilters] =
+    useState<AccommodationSearchFilters>({
+      city: '',
+      endDate: new Date('0001-01-01T00:00:00Z'),
+      startDate: new Date('0001-01-01T00:00:00Z'),
+      guests: -1,
+      pageNumber: 1,
       pageSize: 4,
-      pageNumber: currentPage,
-    };
-    fetchAccommodations(filters);
+    });
+  const [additionalFilters, setAdditionalFilters] =
+    useState<AccommodationFilters>({
+      additions: [],
+      price: { from: 0, to: 500 },
+    });
+
+  useEffect(() => {
+    fetchAccommodations(searchFilters);
   }, []);
 
   const filterByParams = async (
@@ -46,19 +49,17 @@ export const AccommodationPage = () => {
     startDate: Date,
     endDate: Date
   ) => {
-    setCity(city);
-    setGuests(guests);
-    setStartDate(startDate);
-    setEndDate(endDate);
-    setCurrentPage(1);
-    await fetchAccommodations({
+    const newFilters: AccommodationSearchFilters = {
       city,
       guests,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-      pageSize: 4,
+      startDate,
+      endDate,
       pageNumber: 1,
-    });
+      pageSize: searchFilters.pageSize,
+    };
+
+    setSearchFilters({ ...searchFilters, ...newFilters });
+    await fetchAccommodations(newFilters);
   };
 
   const handleEditSelected = (item: Accommodation) => {
@@ -67,27 +68,55 @@ export const AccommodationPage = () => {
   };
 
   const handlePageClick = async (event: any) => {
-    const filters: AccomodationsFilter = {
-      city,
-      guests,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-      pageSize: 4,
-      pageNumber: event.selected + 1,
-    };
-    await fetchAccommodations(filters);
-    setCurrentPage(event.selected + 1);
+    const newFilters = { ...searchFilters, pageNumber: event.selected + 1 };
+    setSearchFilters(newFilters);
+    await fetchAccommodations(newFilters);
   };
 
-  const fetchAccommodations = async (filters: AccomodationsFilter) => {
-    await getAccommodations(filters);
+  const fetchAccommodations = async (filters: AccommodationSearchFilters) => {
+    await getAccommodations(filters, additionalFilters);
   };
+
+  const handleChecked = (
+    field: AccommodationFiltersAdditions,
+    val: boolean
+  ) => {
+    if (val) {
+      setAdditionalFilters({
+        ...additionalFilters,
+        additions: [...additionalFilters.additions, field],
+      });
+      return;
+    }
+    setAdditionalFilters({
+      ...additionalFilters,
+      additions: additionalFilters.additions.filter((add) => add != field),
+    });
+  };
+
+  const handleOnFilter = () => {
+    fetchAccommodations(searchFilters);
+  };
+  const handlePriceChange = (values: number[]) => {
+    setAdditionalFilters({
+      ...additionalFilters,
+      price: { from: values[0], to: values[1] },
+    });
+  };
+
+  useEffect(() => {
+    fetchAccommodations(searchFilters);
+  }, [additionalFilters]);
 
   return (
     <>
-      <SearchAccommodation
-        filterByParams={filterByParams}
-      ></SearchAccommodation>
+      <SearchAccommodation filterByParams={filterByParams} />
+      <AccommodationFiltering
+        filters={additionalFilters}
+        handleChecked={handleChecked}
+        handlePriceChange={handlePriceChange}
+        onFilter={handleOnFilter}
+      />
       <Flex flexDirection='column' justifyContent='center' alignItems='center'>
         {accommodationPageRes.data.data &&
           accommodationPageRes.data.data.map((item: Accommodation) => (
@@ -95,7 +124,7 @@ export const AccommodationPage = () => {
               key={item.id}
               accommodation={item}
               onEditSelected={() => handleEditSelected(item)}
-            ></AccommodationCard>
+            />
           ))}
 
         {accommodationPageRes.status === 'LOADING' && (
@@ -115,7 +144,7 @@ export const AccommodationPage = () => {
       >
         <ReactPaginate
           activeClassName={'item active '}
-          forcePage={currentPage - 1}
+          forcePage={searchFilters.pageNumber - 1}
           breakClassName={'item break-me '}
           breakLabel={'...'}
           containerClassName={'pagination'}

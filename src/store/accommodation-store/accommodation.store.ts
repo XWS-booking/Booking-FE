@@ -1,15 +1,16 @@
 import axios from 'axios';
-import { StateCreator } from 'zustand';
 import produce from 'immer';
-import { AppStore } from '../application.store';
-import { AccomodationsPaginated } from './types/accommodations.type';
-import { CreateAccommodation } from './types/createAccommodation.type';
-import { AccomodationsFilter } from './types/accomodations-filter.type';
-import { ResponseState } from '../response-state.type';
-import { Accommodation } from './types/accommodation.type';
-import { Pricing } from './types/pricing.type';
 import { toast } from 'react-toastify';
+import { StateCreator } from 'zustand';
+import { AppStore } from '../application.store';
+import { ResponseState } from '../response-state.type';
+import { AccommodationFilters } from './types/accommodation.filters.type';
+import { Accommodation } from './types/accommodation.type';
+import { AccomodationsPaginated } from './types/accommodations.type';
+import { AccommodationSearchFilters } from './types/accomodation-search-filters.type';
+import { CreateAccommodation } from './types/createAccommodation.type';
 import { GetBookingPrice } from './types/get-booking-price.type';
+import { Pricing } from './types/pricing.type';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
@@ -19,7 +20,7 @@ export type AccommodationStoreState = {
   editPricingRes: ResponseState<void | null>;
 };
 export type AccommodationActions = {
-  getAccommodations: (data: AccomodationsFilter) => Promise<void>;
+  getAccommodations: (data: AccommodationSearchFilters, additionalFilters: AccommodationFilters) => Promise<void>;
   createAccommodation: (accommodation: CreateAccommodation) => Promise<void>;
   getAccommodation: (id: string) => Promise<Accommodation>;
   editPricing: (id: string, pricing: Pricing[]) => Promise<void>;
@@ -84,7 +85,7 @@ export const accommodationStoreSlice: StateCreator<
     endDate,
     pageSize,
     pageNumber,
-  }: AccomodationsFilter) => {
+  }: AccommodationSearchFilters, additionalFilters: AccommodationFilters) => {
     //Set status to loading
     set(
       produce((state: AccommodationStore) => {
@@ -94,9 +95,11 @@ export const accommodationStoreSlice: StateCreator<
     );
     //Call api url
     try {
-      const url = `${BASE_URL}/api/accommodations/search/${city}/${guests}/${startDate}/${endDate}/${pageSize}/${pageNumber}`;
-      const res = await axios.get(url, {
-        headers: {
+      const url = `${BASE_URL}/api/accommodations/search/${city}/${guests}/${startDate.toISOString()}/${endDate.toISOString()}/${pageSize}/${pageNumber}`;
+      const res = await axios.post(url,
+        additionalFilters, 
+        {
+          headers: {
           Authorization: `Bearer ${get().loginStateRes.data}`,
         },
       });
