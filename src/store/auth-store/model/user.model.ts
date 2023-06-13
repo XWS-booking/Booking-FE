@@ -10,4 +10,5 @@ export type User = {
   zipCode: string;
   country: string;
   username: string;
+  distinguished:boolean;
 };

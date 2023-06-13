@@ -180,6 +180,7 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (
       const resp = await axios.post(`${BASE_URL}/api/auth/user`, {
         token: `Bearer ${token}`,
       });
+      console.log(resp.data)
       set(
         produce((state) => {
           state.user = resp.data;
