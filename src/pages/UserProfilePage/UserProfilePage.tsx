@@ -48,10 +48,10 @@ export const UserProfilePage = () => {
 
   const handleDeleteProfile = async () => {
     const resp = await deleteProfile();
-    if (!resp.error) {
-      logout();
-      navigate('/');
-    }
+    // if (!resp.error) {
+    //   logout();
+    //   navigate('/');
+    // }
   };
 
   const defaultValues: Inputs = {
