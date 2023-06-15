@@ -1,10 +1,18 @@
-import { Button, Divider, Flex, Input, Text } from '@chakra-ui/react';
+import {
+  Button,
+  Divider,
+  Flex,
+  Input,
+  Text,
+  useDisclosure,
+} from '@chakra-ui/react';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Reservation } from '../store/reservation-store/types/reservation.type';
 import moment from 'moment';
 import { useApplicationStore } from '../store/application.store';
 import { Flight } from '../store/accommodation-store/types/flight.type';
+import { BuyFlightTicketModal } from '../components/Flights/BuyFlightTicketModal';
 
 export const ReservationFlightTicketsPage = () => {
   const location = useLocation();
@@ -22,6 +30,8 @@ export const ReservationFlightTicketsPage = () => {
     (state) => state.getDestinationFlightsRes
   );
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const handleDepartureFlights = async (city: string) => {
     await getDepartureFlights(
       city,
@@ -36,6 +46,7 @@ export const ReservationFlightTicketsPage = () => {
       reservation.startDate
     );
   };
+
   return (
     <Flex width={'100%'} direction={'column'}>
       <Flex justifyContent={'center'} width={'100%'} padding={'15px 0'}>
@@ -74,7 +85,12 @@ export const ReservationFlightTicketsPage = () => {
                   {flight.departure} - {flight.destination}{' '}
                   {moment(flight.date).format('DD/MM/YYYY-hh:mm')}
                 </Text>
-                <Button>Buy ticket</Button>
+                <Button onClick={onOpen}>Buy ticket</Button>
+                <BuyFlightTicketModal
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  flight={flight}
+                />
               </Flex>
             ))}
           </Flex>
@@ -105,7 +121,12 @@ export const ReservationFlightTicketsPage = () => {
                   {flight.departure} - {flight.destination}{' '}
                   {moment(flight.date).format('DD/MM/YYYY-hh:mm')}
                 </Text>
-                <Button>Buy ticket</Button>
+                <Button onClick={onOpen}>Buy ticket</Button>
+                <BuyFlightTicketModal
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  flight={flight}
+                />
               </Flex>
             ))}
           </Flex>

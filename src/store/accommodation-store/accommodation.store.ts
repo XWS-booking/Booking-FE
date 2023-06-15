@@ -22,6 +22,7 @@ export type AccommodationStoreState = {
   editPricingRes: ResponseState<void | null>;
   getDepartureFlightsRes: ResponseState<Flight[] | null>;
   getDestinationFlightsRes: ResponseState<Flight[] | null>;
+  purchaseTicketRes: ResponseState<any>;
 };
 export type AccommodationActions = {
   getAccommodations: (
@@ -41,6 +42,11 @@ export type AccommodationActions = {
     departure: string,
     destination: string,
     date: Date
+  ) => Promise<void>;
+  purchaseFlightTicket: (
+    flightId: string,
+    quantity: number,
+    apiKey: string
   ) => Promise<void>;
 };
 
@@ -66,6 +72,11 @@ export const state: AccommodationStoreState = {
     data: null,
   },
   getDestinationFlightsRes: {
+    error: null,
+    status: 'IDLE',
+    data: null,
+  },
+  purchaseTicketRes: {
     error: null,
     status: 'IDLE',
     data: null,
@@ -313,6 +324,49 @@ export const accommodationStoreSlice: StateCreator<
       set(
         produce((state: AccommodationStoreState) => {
           state.getDestinationFlightsRes.status = 'ERROR';
+          state.getDestinationFlightsRes.error = e.response.data.message;
+          return state;
+        })
+      );
+    }
+  },
+  purchaseFlightTicket: async (
+    flightId: string,
+    quantity: number,
+    apiKey: string
+  ) => {
+    set(
+      produce((state: AppStore) => {
+        state.purchaseTicketRes.status = 'LOADING';
+        return state;
+      })
+    );
+    try {
+      const res = await axios.post(
+        `${FLIGHT_APP_URL}/flights/${flightId}/buy-tickets/${quantity}`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Api-Key': apiKey,
+          },
+        }
+      );
+
+      set(
+        produce((state: AppStore) => {
+          state.purchaseTicketRes.data = res.data;
+          state.purchaseTicketRes.status = 'SUCCESS';
+          return state;
+        })
+      );
+      toast.success('Flight tickets successfully bought!');
+    } catch (e: any) {
+      console.log(e);
+      toast.error(e.response.data.message);
+      set(
+        produce((state: AppStore) => {
+          state.purchaseTicketRes.status = 'ERROR';
           state.getDestinationFlightsRes.error = e.response.data.message;
           return state;
         })
