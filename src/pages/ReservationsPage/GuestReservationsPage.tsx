@@ -17,6 +17,7 @@ import { Reservation } from '../../store/reservation-store/types/reservation.typ
 import { format } from 'date-fns';
 import { RateDialog } from '../../components/Reservations/RateDialog';
 import { Accommodation } from '../../store/accommodation-store/types/accommodation.type';
+import { useNavigate } from 'react-router-dom';
 
 export const GuestReservationsPage = () => {
   const getGuestsReservations = useApplicationStore(
@@ -34,14 +35,25 @@ export const GuestReservationsPage = () => {
   const cancelReservation = useApplicationStore(
     (state) => state.cancelReservation
   );
-  const { isOpen, onOpen, onClose} = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [reservation, setReservation] = useState<any>();
-  const rateAccommodationRes = useApplicationStore((state) => state.rateAccommodationRes)
-  const updateAccommodationRatingRes = useApplicationStore((state) => state.updateAccommodationRatingRes)
-  const deleteAccommodationRatingRes = useApplicationStore((state) => state.deleteAccommodationRatingRes)
+  const rateAccommodationRes = useApplicationStore(
+    (state) => state.rateAccommodationRes
+  );
+  const updateAccommodationRatingRes = useApplicationStore(
+    (state) => state.updateAccommodationRatingRes
+  );
+  const deleteAccommodationRatingRes = useApplicationStore(
+    (state) => state.deleteAccommodationRatingRes
+  );
   useEffect(() => {
     fetchReservations();
-  }, [deleteReservationRes, rateAccommodationRes, updateAccommodationRatingRes, deleteAccommodationRatingRes]);
+  }, [
+    deleteReservationRes,
+    rateAccommodationRes,
+    updateAccommodationRatingRes,
+    deleteAccommodationRatingRes,
+  ]);
 
   const fetchReservations = async () => {
     await getGuestsReservations();
@@ -56,9 +68,15 @@ export const GuestReservationsPage = () => {
   };
 
   const openDialog = async (reservation: Reservation) => {
-    setReservation(reservation)
-    onOpen()
-  }
+    setReservation(reservation);
+    onOpen();
+  };
+
+  const navigate = useNavigate();
+  const handleFlightTicketClick = (reservation: Reservation) => {
+    const state = { data: reservation };
+    navigate('/reservation/flight-tickets', { state });
+  };
 
   return (
     <>
@@ -108,7 +126,7 @@ export const GuestReservationsPage = () => {
                       </Button>
                     </Td>
                   )}
-                  {(item.status === 1 && new Date(item.endDate) > new Date()) && (
+                  {item.status === 1 && new Date(item.endDate) > new Date() && (
                     <Td>
                       <Button
                         colorScheme='red'
@@ -118,7 +136,7 @@ export const GuestReservationsPage = () => {
                       </Button>
                     </Td>
                   )}
-                   {(item.status === 1 && new Date(item.endDate) < new Date()) && (
+                  {item.status === 1 && new Date(item.endDate) < new Date() && (
                     <Td>
                       <Button
                         colorScheme='orange'
@@ -128,6 +146,11 @@ export const GuestReservationsPage = () => {
                       </Button>
                     </Td>
                   )}
+                  <Td>
+                    <Button onClick={() => handleFlightTicketClick(item)}>
+                      Flight tickets
+                    </Button>
+                  </Td>
                   {item.status === 2 && <Td></Td>}
                   {item.status === 3 && <Td></Td>}
                 </Tr>

@@ -11,20 +11,43 @@ import { AccommodationSearchFilters } from './types/accomodation-search-filters.
 import { CreateAccommodation } from './types/createAccommodation.type';
 import { GetBookingPrice } from './types/get-booking-price.type';
 import { Pricing } from './types/pricing.type';
+import { Flight } from './types/flight.type';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+const FLIGHT_APP_URL = process.env.REACT_APP_FLIGHT_APP_URL;
 
 export type AccommodationStoreState = {
   accommodationPageRes: ResponseState<AccomodationsPaginated>;
   createAccommodationRes: ResponseState<void | null>;
   editPricingRes: ResponseState<void | null>;
+  getDepartureFlightsRes: ResponseState<Flight[] | null>;
+  getDestinationFlightsRes: ResponseState<Flight[] | null>;
+  purchaseTicketRes: ResponseState<any>;
 };
 export type AccommodationActions = {
-  getAccommodations: (data: AccommodationSearchFilters, additionalFilters: AccommodationFilters) => Promise<void>;
+  getAccommodations: (
+    data: AccommodationSearchFilters,
+    additionalFilters: AccommodationFilters
+  ) => Promise<void>;
   createAccommodation: (accommodation: CreateAccommodation) => Promise<void>;
   getAccommodation: (id: string) => Promise<Accommodation>;
   editPricing: (id: string, pricing: Pricing[]) => Promise<void>;
   getBookingPrice: (id: string, data: GetBookingPrice) => Promise<number>;
+  getDepartureFlights: (
+    departure: string,
+    destination: string,
+    date: Date
+  ) => Promise<void>;
+  getDestinationFlights: (
+    departure: string,
+    destination: string,
+    date: Date
+  ) => Promise<void>;
+  purchaseFlightTicket: (
+    flightId: string,
+    quantity: number,
+    apiKey: string
+  ) => Promise<void>;
 };
 
 export const state: AccommodationStoreState = {
@@ -39,6 +62,21 @@ export const state: AccommodationStoreState = {
     data: null,
   },
   editPricingRes: {
+    error: null,
+    status: 'IDLE',
+    data: null,
+  },
+  getDepartureFlightsRes: {
+    error: null,
+    status: 'IDLE',
+    data: null,
+  },
+  getDestinationFlightsRes: {
+    error: null,
+    status: 'IDLE',
+    data: null,
+  },
+  purchaseTicketRes: {
     error: null,
     status: 'IDLE',
     data: null,
@@ -78,14 +116,17 @@ export const accommodationStoreSlice: StateCreator<
   AccommodationStore
 > = (set, get) => ({
   ...state,
-  getAccommodations: async ({
-    city,
-    guests,
-    startDate,
-    endDate,
-    pageSize,
-    pageNumber,
-  }: AccommodationSearchFilters, additionalFilters: AccommodationFilters) => {
+  getAccommodations: async (
+    {
+      city,
+      guests,
+      startDate,
+      endDate,
+      pageSize,
+      pageNumber,
+    }: AccommodationSearchFilters,
+    additionalFilters: AccommodationFilters
+  ) => {
     //Set status to loading
     set(
       produce((state: AccommodationStore) => {
@@ -96,10 +137,8 @@ export const accommodationStoreSlice: StateCreator<
     //Call api url
     try {
       const url = `${BASE_URL}/api/accommodations/search/${city}/${guests}/${startDate.toISOString()}/${endDate.toISOString()}/${pageSize}/${pageNumber}`;
-      const res = await axios.post(url,
-        additionalFilters, 
-        {
-          headers: {
+      const res = await axios.post(url, additionalFilters, {
+        headers: {
           Authorization: `Bearer ${get().loginStateRes.data}`,
         },
       });
@@ -222,6 +261,116 @@ export const accommodationStoreSlice: StateCreator<
     } catch (e: any) {
       console.log(e);
       return 0;
+    }
+  },
+  getDepartureFlights: async (
+    departure: string,
+    destination: string,
+    date: Date
+  ) => {
+    set(
+      produce((state: AccommodationStoreState) => {
+        state.getDepartureFlightsRes.status = 'LOADING';
+        return state;
+      })
+    );
+    try {
+      const res = await axios.get(
+        `${FLIGHT_APP_URL}/flights/reservation?date=${date}&destination=${destination}&departure=${departure}`
+      );
+      set(
+        produce((state: AccommodationStoreState) => {
+          state.getDepartureFlightsRes.status = 'SUCCESS';
+          state.getDepartureFlightsRes.data = res.data;
+
+          return state;
+        })
+      );
+    } catch (e: any) {
+      console.log(e);
+      set(
+        produce((state: AccommodationStoreState) => {
+          state.getDepartureFlightsRes.status = 'ERROR';
+          state.getDepartureFlightsRes.error = e.response.data.message;
+          return state;
+        })
+      );
+    }
+  },
+  getDestinationFlights: async (
+    departure: string,
+    destination: string,
+    date: Date
+  ) => {
+    set(
+      produce((state: AccommodationStoreState) => {
+        state.getDestinationFlightsRes.status = 'LOADING';
+        return state;
+      })
+    );
+    try {
+      const res = await axios.get(
+        `${FLIGHT_APP_URL}/flights/reservation?date=${date}&destination=${destination}&departure=${departure}`
+      );
+      set(
+        produce((state: AccommodationStoreState) => {
+          state.getDestinationFlightsRes.status = 'SUCCESS';
+          state.getDestinationFlightsRes.data = res.data;
+          return state;
+        })
+      );
+    } catch (e: any) {
+      console.log(e);
+      set(
+        produce((state: AccommodationStoreState) => {
+          state.getDestinationFlightsRes.status = 'ERROR';
+          state.getDestinationFlightsRes.error = e.response.data.message;
+          return state;
+        })
+      );
+    }
+  },
+  purchaseFlightTicket: async (
+    flightId: string,
+    quantity: number,
+    apiKey: string
+  ) => {
+    set(
+      produce((state: AppStore) => {
+        state.purchaseTicketRes.status = 'LOADING';
+        return state;
+      })
+    );
+    try {
+      const res = await axios.post(
+        `${FLIGHT_APP_URL}/flights/${flightId}/buy-tickets/${quantity}`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Api-Key': apiKey,
+          },
+        }
+      );
+
+      set(
+        produce((state: AppStore) => {
+          state.purchaseTicketRes.data = res.data;
+          state.purchaseTicketRes.status = 'SUCCESS';
+          return state;
+        })
+      );
+      toast.success('Flight tickets successfully bought!');
+    } catch (e: any) {
+      console.log(e);
+      toast.error(e.response.data.message);
+      set(
+        produce((state: AppStore) => {
+          state.purchaseTicketRes.status = 'ERROR';
+          state.getDestinationFlightsRes.error = e.response.data.message;
+          return state;
+        })
+      );
     }
   },
 });

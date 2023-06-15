@@ -6,6 +6,7 @@ import { GuestReservationsPage } from '../pages/ReservationsPage/GuestReservatio
 import { OwnerReservationsPage } from '../pages/ReservationsPage/OwnerReservationsPage';
 import { HostPage } from '../pages/HostPage/HostPage';
 import { NotificationPage } from '../pages/NotificationsPage/NotificationsPage';
+import { ReservationFlightTicketsPage } from '../pages/ReservationFlightTicketsPage';
 
 export const routes: RouteObject[] = [
   {
@@ -34,7 +35,11 @@ export const routes: RouteObject[] = [
       },
       {
         path: '/notifications',
-        element: <NotificationPage/>,
+        element: <NotificationPage />,
+      },
+      {
+        path: '/reservation/flight-tickets',
+        element: <ReservationFlightTicketsPage></ReservationFlightTicketsPage>,
       },
     ],
   },
