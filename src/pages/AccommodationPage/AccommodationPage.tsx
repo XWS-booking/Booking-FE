@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
 import { AccommodationCard } from '../../components/Accommodations/AccommodationCard';
 import { AccommodationFiltering } from '../../components/Accommodations/AccommodationFilters';
+import { Recommendation } from '../../components/Accommodations/Recommendation';
 import { SearchAccommodation } from '../../components/Accommodations/SearchAccommodation';
 import { EditAccommodationForm } from '../../components/EditAccommodationForm/EditAccommodationForm';
 import {
@@ -111,6 +112,7 @@ export const AccommodationPage = () => {
   return (
     <>
       <SearchAccommodation filterByParams={filterByParams} />
+      <Recommendation />
       <AccommodationFiltering
         filters={additionalFilters}
         handleChecked={handleChecked}
