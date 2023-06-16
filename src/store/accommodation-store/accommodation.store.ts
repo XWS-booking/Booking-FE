@@ -9,9 +9,9 @@ import { Accommodation } from './types/accommodation.type';
 import { AccomodationsPaginated } from './types/accommodations.type';
 import { AccommodationSearchFilters } from './types/accomodation-search-filters.type';
 import { CreateAccommodation } from './types/createAccommodation.type';
+import { Flight } from './types/flight.type';
 import { GetBookingPrice } from './types/get-booking-price.type';
 import { Pricing } from './types/pricing.type';
-import { Flight } from './types/flight.type';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 const FLIGHT_APP_URL = process.env.REACT_APP_FLIGHT_APP_URL;
@@ -48,6 +48,7 @@ export type AccommodationActions = {
     quantity: number,
     apiKey: string
   ) => Promise<void>;
+  getRecommendedAccommodations: () => Promise<Accommodation[]>
 };
 
 export const state: AccommodationStoreState = {
@@ -373,4 +374,18 @@ export const accommodationStoreSlice: StateCreator<
       );
     }
   },
+  getRecommendedAccommodations: async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/accomodation/recommended`, {
+        headers: {
+          Authorization: `Bearer ${get().loginStateRes.data}`
+        }
+      })
+      console.log(res.data)
+      return res.data
+    } catch(e: any) {
+      console.log(e)
+      return []
+    }
+  }
 });
