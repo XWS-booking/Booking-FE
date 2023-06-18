@@ -131,7 +131,7 @@ export const authStoreSlice: StateCreator<AppStore, [], [], AuthStore> = (
           return state;
         })
       );
-      toast.success('Successfully deleted profile!');
+      toast.success('Request succesfully sent!');
       return {
         data: null,
         error: null,

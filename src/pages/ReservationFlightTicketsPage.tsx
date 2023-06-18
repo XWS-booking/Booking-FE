@@ -40,10 +40,11 @@ export const ReservationFlightTicketsPage = () => {
     );
   };
   const handleDestinationFlights = async (city: string) => {
+    console.log(reservation.endDate);
     await getDestinationFlights(
       reservation.accommodation.city,
       city,
-      reservation.startDate
+      reservation.endDate
     );
   };
 
